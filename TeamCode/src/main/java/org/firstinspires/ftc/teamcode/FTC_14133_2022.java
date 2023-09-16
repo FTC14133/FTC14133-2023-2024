@@ -38,7 +38,7 @@ public class  FTC_14133_2022 extends OpMode {
      Lift = new Lift(hardwareMap);
      Sensors = new Sensors(hardwareMap);
      Lights = new Lights(hardwareMap);
-     //Alliance = AllianceSingleton.AllianceInstance().GetAlliance();
+
  }
 
  public void start() {
@@ -50,28 +50,16 @@ public class  FTC_14133_2022 extends OpMode {
  public void loop() {
      telemetry.addData("Status", "Looping");
 
-     Lift.Teleop(gamepad2, telemetry); //Run the regular arm function
+     //Lift.Teleop(gamepad2, telemetry); //Run the regular arm function
 
-     drivetrain.Teleop(gamepad1, telemetry, Lift.GetArmHome(), Lift.GetElevatorHome());
+     drivetrain.Teleop(gamepad1, telemetry);
 
-     Lights.Update_Lights(Intake.getPossession(), Alliance, gamepad1.left_stick_button || gamepad2.left_stick_button);
+     //Lights.Update_Lights(Intake.getPossession(), Alliance, gamepad1.left_stick_button || gamepad2.left_stick_button);
 
-     Intake.Teleop(gamepad2, telemetry); //Passes position of the arm so intake direction can change.
-     Intake.beambreak_print(telemetry);
+     //Intake.Teleop(gamepad2, telemetry); //Passes position of the arm so intake direction can change.
+     //Intake.beambreak_print(telemetry);
      telemetry.update();
-     Intake.Possession_Check();
+     //Intake.Possession_Check();
 
  }
-
-/*    public void stop() {
-        Lift.GotoPosition(4 , 0, 0);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        super.stop();
-    }*/
-
-
 }
