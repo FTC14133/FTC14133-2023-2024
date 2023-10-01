@@ -61,7 +61,6 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
                 routine = 7;
             }
             //Detection for April Tags
-            detected = Detection.AprilTagDetection(telemetry);
             telemetry.update();
         }
 

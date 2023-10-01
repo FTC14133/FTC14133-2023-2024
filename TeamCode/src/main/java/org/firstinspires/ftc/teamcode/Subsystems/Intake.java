@@ -52,9 +52,9 @@ public class Intake {
     public void Teleop(Gamepad gamepad2, Telemetry telemetry) { //Code to be run in Op Mode void Loop at top level
         if (toggleIntake && gamepad2.right_bumper) {
             toggleIntake = false;  // Prevents this section of code from being called again until the Button is released and re-pressed
-            if (gamepad2.right_bumper) {
-                intakeOpen = intakeOpen * -1;
-            }
+
+            intakeOpen = intakeOpen * -1;
+
         } else if (!gamepad2.right_bumper) {
             toggleIntake = true;
         }

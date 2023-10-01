@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Reference.OdomotryTests.FinalOdo.OdometrySystem;
 
-@TeleOp(name="ThreadingTeleop", group="Iterative Opmode")
+@TeleOp(name="OdoTeleop", group="Iterative Opmode")
 
 public class OdoTeleop extends OpMode {
 

@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.Reference.OdomotryTests.FinalOdo;
-
-import java.lang.Math;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -13,13 +11,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-
-public class OdometrySystem extends Thread{
-
-    private Drivetrain drivetrain=null;
+public class Odometry extends Thread{
 
     private static DcMotorEx paraEncoder;
     private static DcMotorEx perpEncoder;
@@ -43,8 +38,7 @@ public class OdometrySystem extends Thread{
     public double XPos = 0;
     public double YPos = 0;
 
-    public OdometrySystem(HardwareMap hardwareMap){
-        drivetrain = new Drivetrain(hardwareMap);
+    public Odometry(HardwareMap hardwareMap){
 
         paraEncoder = hardwareMap.get(DcMotorEx.class, "paraEncoder");
         perpEncoder = hardwareMap.get(DcMotorEx.class, "perpEncoder");
@@ -92,15 +86,8 @@ public class OdometrySystem extends Thread{
         }
     }
 
-    public List<Object> Return_Coords(){
+    public List<Double> Return_Coords(){
         return Arrays.asList(XPos, YPos);
-    }
-
-    public void GoToCoord(double targetx, double targety, double speed, double direction, Telemetry telemetry){
-        double realDirection = (360-currentAngle)+direction;
-        double distance = Math.sqrt(Math.pow(targetx-XPos, 2)+Math.pow(targety-YPos, 2));
-
-        drivetrain.DrivetrainAutoMove(distance, speed, realDirection, telemetry);
     }
 
     public void run(){

@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
 import java.lang.Math;
+import java.util.List;
 import java.util.Objects;
 
 public class Drivetrain  {
@@ -40,9 +41,9 @@ public class Drivetrain  {
         rb = hardwareMap.get(DcMotorEx.class, "rb");
 
         // Set motor direction based on which side of the robot the motors are on
-        lb.setDirection(DcMotorEx.Direction.FORWARD);
+        lb.setDirection(DcMotorEx.Direction.REVERSE);
         rb.setDirection(DcMotorEx.Direction.FORWARD);
-        lf.setDirection(DcMotorEx.Direction.FORWARD);
+        lf.setDirection(DcMotorEx.Direction.REVERSE);
         rf.setDirection(DcMotorEx.Direction.FORWARD);
     }
 
@@ -128,6 +129,20 @@ public class Drivetrain  {
 
     public void DrivetrainAutoMove(double speed, double rotation, Telemetry telemetry){
         DrivetrainAutoMove(0, speed, 0, rotation, telemetry);
+    }
+
+    public void GoToCoord(List<Double> curcoords, List<Double> tarcoords, double currentAngle, double speed, double direction, Telemetry telemetry){
+
+        double XPos = curcoords.get(0);
+        double YPos = curcoords.get(1);
+
+        double targetx = tarcoords.get(0);
+        double targety = tarcoords.get(1);
+
+        double realDirection = (360-currentAngle)+direction;
+        double distance = Math.sqrt(Math.pow(targetx-XPos, 2)+Math.pow(targety-YPos, 2));
+
+        DrivetrainAutoMove(distance, speed, realDirection, telemetry);
     }
 
     public void Teleop(Gamepad gamepad1, Telemetry telemetry){ //Code to be run in Teleop Mode void Loop at top level

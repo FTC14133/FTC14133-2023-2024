@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Reference.OdomotryTests.FinalOdo.OdometrySystem;
 
-@Autonomous(name="ThreadingAuto", group="Auto")
+@Autonomous(name="OdoAuto", group="Auto")
 
 public class OdoAuto extends LinearOpMode {
 

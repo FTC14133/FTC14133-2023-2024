@@ -5,12 +5,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.AllianceSingleton;
+import org.firstinspires.ftc.teamcode.Subsystems.Detection;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Lift;
-import org.firstinspires.ftc.teamcode.Subsystems.Sensors;
-import org.firstinspires.ftc.teamcode.Subsystems.Lights;
+//import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+//import org.firstinspires.ftc.teamcode.Subsystems.Lift;
+//import org.firstinspires.ftc.teamcode.Subsystems.Sensors;
+//import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 
 @TeleOp(name="FTC_14133_2022", group="Iterative Opmode") // Labels program in Driver station Selection
 
@@ -23,21 +23,23 @@ import org.firstinspires.ftc.teamcode.Subsystems.Lights;
 //COMMENT YOUR CODE (VIHAAN)! We're adding a lot of automation, which is nice, but it is going to be REALLY difficult to troubleshoot.
 
 public class  FTC_14133_2022 extends OpMode {
-    private Drivetrain drivetrain=null;
-    private Intake Intake=null;
-    private Lift Lift=null;
-    private Sensors Sensors=null;
-    private Lights Lights=null;
+    private Drivetrain Drivetrain =null;
+    //private Intake Intake=null;
+    //private Lift Lift=null;
+    //private Sensors Sensors=null;
+    //private Lights Lights=null;
+    private Detection Detection=null;
     boolean [] switches;
     boolean Alliance;
     boolean Warehouse_TurnTable;
 
  public void init() {
-     drivetrain = new Drivetrain(hardwareMap);
-     Intake = new Intake(hardwareMap);
-     Lift = new Lift(hardwareMap);
-     Sensors = new Sensors(hardwareMap);
-     Lights = new Lights(hardwareMap);
+     Drivetrain = new Drivetrain(hardwareMap);
+     //Intake = new Intake(hardwareMap);
+     //Lift = new Lift(hardwareMap);
+     //Sensors = new Sensors(hardwareMap);
+     //Lights = new Lights(hardwareMap);
+     Detection = new Detection(hardwareMap);
 
  }
 
@@ -50,16 +52,14 @@ public class  FTC_14133_2022 extends OpMode {
  public void loop() {
      telemetry.addData("Status", "Looping");
 
-     //Lift.Teleop(gamepad2, telemetry); //Run the regular arm function
+     //Drivetrain.Teleop(gamepad1, telemetry);
+     Detection.Teleop(telemetry, gamepad1);
 
-     drivetrain.Teleop(gamepad1, telemetry);
-
-     //Lights.Update_Lights(Intake.getPossession(), Alliance, gamepad1.left_stick_button || gamepad2.left_stick_button);
-
-     //Intake.Teleop(gamepad2, telemetry); //Passes position of the arm so intake direction can change.
-     //Intake.beambreak_print(telemetry);
      telemetry.update();
-     //Intake.Possession_Check();
 
+ }
+
+ public void stop(){
+     Detection.StopPortal();
  }
 }
