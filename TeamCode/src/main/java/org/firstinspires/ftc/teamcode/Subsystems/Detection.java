@@ -21,8 +21,11 @@
 
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -49,6 +52,16 @@ public class Detection {
      */
     private VisionPortal visionPortal;
 
+    final double DESIRED_DISTANCE = 5;
+
+    final double MAX_AUTO_SPEED = 0.5;
+    final double MAX_AUTO_STRAFE = 0.5;
+    final double MAX_AUTO_TURN = 0.3;
+
+    final double SPEED_GAIN = 0.02;
+    final double STRAFE_GAIN = 0.015;
+    final double TURN_GAIN = 0.01;
+
     public Detection(HardwareMap hardwareMap){
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
 
@@ -71,6 +84,7 @@ public class Detection {
 
     }
 
+    @SuppressLint("DefaultLocale")
     private void telemetryAprilTag(Telemetry telemetry) {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -88,6 +102,22 @@ public class Detection {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
+
+            if (detection.id == 3){
+                double  rangeError = (detection.ftcPose.range - DESIRED_DISTANCE);
+                double  headingError = detection.ftcPose.bearing;
+                double  yawError = -1 * (detection.ftcPose.yaw);
+
+                double drive  = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                double turn   = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN) ;
+                double strafe = Range.clip(yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+
+                telemetry.addLine(String.format("\nDrive: %6.1f", rangeError));
+                telemetry.addLine(String.format("Turn: %6.1f", headingError));
+                telemetry.addLine(String.format("Strafe: %6.1f", yawError));
+
+            }
+
         }   // end for() loop
 
         // Add "key" information to telemetry
