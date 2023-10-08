@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.Reference.LearnJava;
+package org.firstinspires.ftc.teamcode.Reference.LearnJava.System;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name="TestTeleop", group="Auto")
+@Autonomous(name="TestAuto", group="Auto")
 
 public class TestAuto extends LinearOpMode {
 
