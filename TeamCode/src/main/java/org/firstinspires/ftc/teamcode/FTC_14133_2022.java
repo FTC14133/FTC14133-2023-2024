@@ -52,8 +52,8 @@ public class  FTC_14133_2022 extends OpMode {
  public void loop() {
      telemetry.addData("Status", "Looping");
 
-     //Drivetrain.Teleop(gamepad1, telemetry);
-     Detection.Teleop(telemetry, gamepad1);
+     Drivetrain.Teleop(gamepad1, telemetry);
+     //Detection.Teleop(telemetry, gamepad1);
 
      telemetry.update();
 

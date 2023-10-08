@@ -27,7 +27,7 @@ public class Drivetrain  {
 
     final double countsperrev = 28; // Counts per rev of the motor
     final double wheelD =96.0/25.4; // Diameter of the wheel (in inches)
-    final double gearratio=(76.0/21.0)*(68.0/13.0); //Ratio of the entire drivetrain from the motor to the wheel
+    final double gearratio=(84.0/29.0)*(84.0/29.0)*(76.0/21.0); //Ratio of the entire drivetrain from the motor to the wheel
     final double rotationK = 0.35; //Scaling factor for rotation (Teleop) Todo: Determine a good scaling factor for this. Should also calculate for real based on wheel diameter and location on robot.
 
     final double countsperin = countsperrev*(gearratio)*(1/(Math.PI*wheelD));
@@ -43,7 +43,7 @@ public class Drivetrain  {
         // Set motor direction based on which side of the robot the motors are on
         lb.setDirection(DcMotorEx.Direction.REVERSE);
         rb.setDirection(DcMotorEx.Direction.FORWARD);
-        lf.setDirection(DcMotorEx.Direction.REVERSE);
+        lf.setDirection(DcMotorEx.Direction.FORWARD);
         rf.setDirection(DcMotorEx.Direction.FORWARD);
     }
 
@@ -60,11 +60,12 @@ public class Drivetrain  {
          * Distance in inches, Speed in in/s, Direction in degrees (Front of robot is 0 deg, CCW is positive), Rotation in degrees (CCW is pos)
          */
 
+        distance = distance*2;
+
         double angle = Math.toRadians(direction);
 
-        double yDistance = Math.cos(angle) * distance;
-        double xDistance = Math.sin(angle) * distance;
-        double zDistance = rotation * inchesperdegrotation;
+        double sin = Math.sin(angle - Math.PI/4);
+        double cos = Math.cos(angle - Math.PI/4);
 
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -75,17 +76,17 @@ public class Drivetrain  {
         lb.setTargetPositionTolerance(tolerance);
         rb.setTargetPositionTolerance(tolerance);
 
-        double denominator = Math.max(Math.abs(yDistance) + Math.abs(xDistance) + Math.abs(zDistance), 1);
+        double denominator = Math.max(Math.abs(distance * cos), Math.max(Math.abs(distance * sin), 1.0));
 
-        double lfPower = (yDistance + xDistance + zDistance) / denominator;      //Speed for leftfront
-        double lbPower = (yDistance - xDistance + zDistance) / denominator;      //Speed for leftback
-        double rfPower = (yDistance - xDistance - zDistance) / denominator;      //Speed for rightfront
-        double rbPower = (yDistance + xDistance - zDistance) / denominator;      //Speed for rightback
+        double lfPower = (distance * cos) / denominator;      //Speed for leftfront
+        double lbPower = (distance * sin) / denominator;      //Speed for leftback
+        double rfPower = (distance * sin) / denominator;      //Speed for rightfront
+        double rbPower = (distance * cos) / denominator;      //Speed for rightback
 
-        double lfD = (yDistance + xDistance + zDistance);      //distance for leftfront
-        double lbD = (yDistance - xDistance + zDistance);      //distance for leftback
-        double rfD = (yDistance - xDistance - zDistance);      //distance for rightfront
-        double rbD = (yDistance + xDistance - zDistance);      //distance for rightback
+        double lfD = (distance * cos);      //distance for leftfront
+        double lbD = (distance * sin);      //distance for leftback
+        double rfD = (distance * sin);      //distance for rightfront
+        double rbD = (distance * cos);      //distance for rightback
 
         int rfEncoderCounts = (int)(lfD * countsperin);
         int lfEncoderCounts = (int)(rfD * countsperin);
@@ -96,8 +97,8 @@ public class Drivetrain  {
         lf.setTargetPosition(lfEncoderCounts);
         lb.setTargetPosition(lbEncoderCounts);
         rb.setTargetPosition(rbEncoderCounts);
-        rf.setPower(lfPower);
-        lf.setPower(rfPower);
+        rf.setPower(rfPower);
+        lf.setPower(lfPower);
         lb.setPower(lbPower);
         rb.setPower(rbPower);
         rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -110,6 +111,11 @@ public class Drivetrain  {
             telemetry.addData("lf.getCurrentPosition()", lf.getCurrentPosition());
             telemetry.addData("lb.getCurrentPosition()", lb.getCurrentPosition());
             telemetry.addData("rb.getCurrentPosition()", rb.getCurrentPosition());
+
+            telemetry.addData("lfPower", lfPower);
+            telemetry.addData("lbPower", lbPower);
+            telemetry.addData("rfPower", rfPower);
+            telemetry.addData("rbPower", rbPower);
 
             telemetry.addData("rfencodercounts", rfEncoderCounts);
             telemetry.addData("lfencodercounts", lfEncoderCounts);
@@ -170,9 +176,9 @@ public class Drivetrain  {
             rfpower = rfpower/1.5;
         }*/
 
-        rf.setPower(lfPower);
-        lf.setPower(lbPower);
-        lb.setPower(rfPower);
+        rf.setPower(rfPower);
+        lf.setPower(lfPower);
+        lb.setPower(lbPower);
         rb.setPower(rbPower);
 
         telemetry.addData("RF Power", rfPower);
