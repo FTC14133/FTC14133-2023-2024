@@ -31,7 +31,7 @@ public class Drivetrain  {
     final double rotationK = 0.45; //Scaling factor for rotation (Teleop) Todo: Determine a good scaling factor for this. Should also calculate for real based on wheel diameter and location on robot.
 
     final double countsperin = countsperrev*(gearratio)*(1/(Math.PI*wheelD));
-    final double wheelBaseR = 15.5/2.0; //Wheel base radius in inches
+    final double wheelBaseR = 13.859564; //Wheel base radius in inches
     final double inchesperdegrotation = 2 * Math.PI * wheelBaseR * (1.0/360.0);
 
     public Drivetrain(HardwareMap hardwareMap){                 // Motor Mapping
@@ -60,13 +60,10 @@ public class Drivetrain  {
          * Distance in inches, Speed in in/s, Direction in degrees (Front of robot is 0 deg, CCW is positive), Rotation in degrees (CCW is pos)
          */
 
-        distance = distance*2;
-        direction = direction+90;
-
         double angle = Math.toRadians(direction);
 
-        double sin = Math.sin(angle - Math.PI/4);
-        double cos = Math.cos(angle - Math.PI/4);
+        double forward = Math.cos(angle)*distance;
+        double strafe = Math.sin(angle)*distance;
 
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -77,22 +74,29 @@ public class Drivetrain  {
         lb.setTargetPositionTolerance(tolerance);
         rb.setTargetPositionTolerance(tolerance);
 
-        double denominator = Math.max(Math.abs(distance * cos), Math.max(Math.abs(distance * sin), 1.0));
+        double rotPower = Math.min(speed, (speed*rotation));
 
-        double lfPower = (distance * cos) / denominator;      //Speed for leftfront
-        double lbPower = (distance * sin) / denominator;      //Speed for leftback
-        double rfPower = (distance * sin) / denominator;      //Speed for rightfront
-        double rbPower = (distance * cos) / denominator;      //Speed for rightback
+        double lfPower = (((forward + strafe)) + rotPower);      //Speed for leftfront
+        double lbPower = (((forward - strafe)) + rotPower);      //Speed for leftback
+        double rfPower = (((forward - strafe)) - rotPower);      //Speed for rightfront
+        double rbPower = (((forward + strafe)) - rotPower);      //Speed for rightback
 
-        double lfD = (distance * cos);      //distance for leftfront
-        double lbD = (distance * sin);      //distance for leftback
-        double rfD = (distance * sin);      //distance for rightfront
-        double rbD = (distance * cos);      //distance for rightback
+        double denominator = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
 
-        int rfEncoderCounts = (int)(lfD * countsperin);
-        int lfEncoderCounts = (int)(rfD * countsperin);
-        int lbEncoderCounts = (int)(rbD * countsperin);
-        int rbEncoderCounts = (int)(lbD * countsperin);
+        lfPower = (lfPower/denominator) * speed;
+        lbPower = (lbPower/denominator) * speed;
+        rfPower = (rfPower/denominator) * speed;
+        rbPower = (rbPower/denominator) * speed;
+
+        double lfD = ((forward + strafe) + (rotation * inchesperdegrotation));      //distance for leftfront
+        double lbD = ((forward - strafe) + (rotation * inchesperdegrotation));      //distance for leftback
+        double rfD = ((forward - strafe) - (rotation * inchesperdegrotation));      //distance for rightfront
+        double rbD = ((forward + strafe) - (rotation * inchesperdegrotation));      //distance for rightback
+
+        int rfEncoderCounts = (int)(rfD * countsperin);
+        int lfEncoderCounts = (int)(lfD * countsperin);
+        int lbEncoderCounts = (int)(lbD * countsperin);
+        int rbEncoderCounts = (int)(rbD * countsperin);
 
         rf.setTargetPosition(rfEncoderCounts);
         lf.setTargetPosition(lfEncoderCounts);
