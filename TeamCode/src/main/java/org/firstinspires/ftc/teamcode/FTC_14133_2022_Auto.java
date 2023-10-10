@@ -27,6 +27,8 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
         HardwareStart();
 
+        waitForStart();
+
         telemetry.addData("Object", "Passed waitForStart");
 
         //drivetrain.GoToCoord();

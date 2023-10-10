@@ -31,7 +31,7 @@ public class Drivetrain  {
     final double rotationK = 0.45; //Scaling factor for rotation (Teleop) Todo: Determine a good scaling factor for this. Should also calculate for real based on wheel diameter and location on robot.
 
     final double countsperin = countsperrev*(gearratio)*(1/(Math.PI*wheelD));
-    final double wheelBaseR = 13.859564; //Wheel base radius in inches
+    final double wheelBaseR = 13.859564; //Wheel base radius in inches (distance between center of wheels on (long) side)
     final double inchesperdegrotation = 2 * Math.PI * wheelBaseR * (1.0/360.0);
 
     public Drivetrain(HardwareMap hardwareMap){                 // Motor Mapping
@@ -47,24 +47,18 @@ public class Drivetrain  {
         rf.setDirection(DcMotorEx.Direction.FORWARD);
     }
 
-    public static void StopDrivetrain(){
-        lb.setPower(0);
-        rb.setPower(0);
-        lf.setPower(0);
-        rf.setPower(0);
-    }
-
     public void DrivetrainAutoMove(double distance, double speed, double direction, double rotation, Telemetry telemetry) {
         /*
          * Commands the robot to move a certain direction for a certain distance
          * Distance in inches, Speed in in/s, Direction in degrees (Front of robot is 0 deg, CCW is positive), Rotation in degrees (CCW is pos)
          */
 
-        double angle = Math.toRadians(direction);
+        double angle = Math.toRadians(direction); // Converting direction to radians for sin and cos functions
 
-        double forward = Math.cos(angle)*distance;
-        double strafe = Math.sin(angle)*distance;
+        double forward = Math.cos(angle)*distance; // Getting how much we need to move forward with cos (distance is hypot)
+        double strafe = Math.sin(angle)*distance;// Getting how much we need to move strafe with cos (distance is hypot)
 
+        //Says that the current pos is 0
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -74,13 +68,14 @@ public class Drivetrain  {
         lb.setTargetPositionTolerance(tolerance);
         rb.setTargetPositionTolerance(tolerance);
 
-        double rotPower = Math.min(speed, (speed*rotation));
+        double rotPower = Math.min(speed, (speed*rotation)); // Checking if we have any rotation (if 0 speed is 0)
 
         double lfPower = (((forward + strafe)) + rotPower);      //Speed for leftfront
         double lbPower = (((forward - strafe)) + rotPower);      //Speed for leftback
         double rfPower = (((forward - strafe)) - rotPower);      //Speed for rightfront
         double rbPower = (((forward + strafe)) - rotPower);      //Speed for rightback
 
+        //if the power is over 1
         double denominator = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
 
         lfPower = (lfPower/denominator) * speed;
@@ -93,19 +88,23 @@ public class Drivetrain  {
         double rfD = ((forward - strafe) - (rotation * inchesperdegrotation));      //distance for rightfront
         double rbD = ((forward + strafe) - (rotation * inchesperdegrotation));      //distance for rightback
 
+        // Converting inches to encoder counts
         int rfEncoderCounts = (int)(rfD * countsperin);
         int lfEncoderCounts = (int)(lfD * countsperin);
         int lbEncoderCounts = (int)(lbD * countsperin);
         int rbEncoderCounts = (int)(rbD * countsperin);
 
+        //Setting where the motors need to go
         rf.setTargetPosition(rfEncoderCounts);
         lf.setTargetPosition(lfEncoderCounts);
         lb.setTargetPosition(lbEncoderCounts);
         rb.setTargetPosition(rbEncoderCounts);
+        //How fast the motors need to go
         rf.setPower(rfPower);
         lf.setPower(lfPower);
         lb.setPower(lbPower);
         rb.setPower(rbPower);
+        // Telling the motors to go to target pos
         rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
