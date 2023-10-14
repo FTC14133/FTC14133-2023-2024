@@ -155,17 +155,26 @@ public class Drivetrain  {
         DrivetrainAutoMove(distance, speed, realDirection, telemetry);
     }
 
-    public void Teleop(Gamepad gamepad1, Telemetry telemetry){ //Code to be run in Teleop Mode void Loop at top level
+    public void Teleop(double curAngle, Gamepad gamepad1, Telemetry telemetry){ //Code to be run in Teleop Mode void Loop at top level
         double leftPowerY = -gamepad1.left_stick_y;      //find the value of y axis on the left joystick
         double leftPowerX = gamepad1.left_stick_x;      //find the value of x axis on the left joystick
         double rightPowerX = gamepad1.right_stick_x*rotationK;     //find the value of x axis on the right joystick
 
-        double denominator = Math.max(Math.abs(leftPowerY) + Math.abs(leftPowerX) + Math.abs(rightPowerX), 1);
+        curAngle = Math.toRadians(curAngle);
 
-        double lfPower = (leftPowerY + leftPowerX + rightPowerX) / denominator;
-        double lbPower = (leftPowerY - leftPowerX + rightPowerX) / denominator;
-        double rfPower = (leftPowerY - leftPowerX - rightPowerX) / denominator;
-        double rbPower = (leftPowerY + leftPowerX - rightPowerX) / denominator;
+        double strafe = leftPowerX * Math.cos(-curAngle) - leftPowerY * Math.sin(-curAngle);
+        double forward = leftPowerX * Math.sin(-curAngle) + leftPowerY * Math.cos(-curAngle);
+
+        telemetry.addData("forward", forward);
+        telemetry.addData("strafe", strafe);
+        telemetry.addData("rightPowerX", rightPowerX);
+
+        double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(rightPowerX), 1);
+
+        double lfPower = (forward + strafe + rightPowerX) / denominator;
+        double lbPower = (forward - strafe + rightPowerX) / denominator;
+        double rfPower = (forward - strafe - rightPowerX) / denominator;
+        double rbPower = (forward + strafe - rightPowerX) / denominator;
 
 
         if (gamepad1.right_bumper){
