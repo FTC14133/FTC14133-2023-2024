@@ -16,7 +16,7 @@ import java.lang.Math;
 import java.util.List;
 import java.util.Objects;
 
-public class Drivetrain extends Odometry{
+public class Drivetrain{
     // Instantiate the drivetrain motor variables
     private static DcMotorEx lf; //Back left motor of drivetrain
     private static DcMotorEx rf; //Back right motor of drivetrain
@@ -53,15 +53,10 @@ public class Drivetrain extends Odometry{
          * Distance in inches, Speed in in/s, Direction in degrees (Front of robot is 0 deg, CCW is positive), Rotation in degrees (CCW is pos)
          */
 
-        double curAngle = Return_Angle(false);
-        direction = direction + (360-curAngle);
-
         double angle = Math.toRadians(direction); // Converting direction to radians for sin and cos functions
 
         double forward = Math.cos(angle)*distance; // Getting how much we need to move forward with cos (distance is hypot)
         double strafe = Math.sin(angle)*distance;// Getting how much we need to move strafe with cos (distance is hypot)
-
-        rotation = rotation + (360-curAngle);
 
         //Says that the current pos is 0
         rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -73,20 +68,7 @@ public class Drivetrain extends Odometry{
         lb.setTargetPositionTolerance(tolerance);
         rb.setTargetPositionTolerance(tolerance);
 
-        double rotDistance = (rotation * inchesperdegrotation);
-
-        double lfD = ((forward + strafe) + rotDistance);      //distance for leftfront
-        double lbD = ((forward - strafe) + rotDistance);      //distance for leftback
-        double rfD = ((forward - strafe) - rotDistance);      //distance for rightfront
-        double rbD = ((forward + strafe) - rotDistance);      //distance for rightback
-
-        // Converting inches to encoder counts
-        int rfEncoderCounts = (int)(rfD * countsperin);
-        int lfEncoderCounts = (int)(lfD * countsperin);
-        int lbEncoderCounts = (int)(lbD * countsperin);
-        int rbEncoderCounts = (int)(rbD * countsperin);
-
-        double rotPower = rotDistance/distance; // Checking if we have any rotation (if 0 speed is 0)
+        double rotPower = Math.min(speed, (speed*rotation)); // Checking if we have any rotation (if 0 speed is 0)
 
         double lfPower = (((forward + strafe)) + rotPower);      //Speed for leftfront
         double lbPower = (((forward - strafe)) + rotPower);      //Speed for leftback
@@ -100,6 +82,17 @@ public class Drivetrain extends Odometry{
         lbPower = (lbPower/denominator) * speed;
         rfPower = (rfPower/denominator) * speed;
         rbPower = (rbPower/denominator) * speed;
+
+        double lfD = ((forward + strafe) + (rotation * inchesperdegrotation));      //distance for leftfront
+        double lbD = ((forward - strafe) + (rotation * inchesperdegrotation));      //distance for leftback
+        double rfD = ((forward - strafe) - (rotation * inchesperdegrotation));      //distance for rightfront
+        double rbD = ((forward + strafe) - (rotation * inchesperdegrotation));      //distance for rightback
+
+        // Converting inches to encoder counts
+        int rfEncoderCounts = (int)(rfD * countsperin);
+        int lfEncoderCounts = (int)(lfD * countsperin);
+        int lbEncoderCounts = (int)(lbD * countsperin);
+        int rbEncoderCounts = (int)(rbD * countsperin);
 
         //Setting where the motors need to go
         rf.setTargetPosition(rfEncoderCounts);
@@ -117,27 +110,30 @@ public class Drivetrain extends Odometry{
         lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        telemetry.addData("rf.getCurrentPosition()", rf.getCurrentPosition());
-        telemetry.addData("lf.getCurrentPosition()", lf.getCurrentPosition());
-        telemetry.addData("lb.getCurrentPosition()", lb.getCurrentPosition());
-        telemetry.addData("rb.getCurrentPosition()", rb.getCurrentPosition());
+        while (lf.isBusy() || rf.isBusy()/* || lb.isBusy() || rb.isBusy()*/) {
+            telemetry.addData("rf.getCurrentPosition()", rf.getCurrentPosition());
+            telemetry.addData("lf.getCurrentPosition()", lf.getCurrentPosition());
+            telemetry.addData("lb.getCurrentPosition()", lb.getCurrentPosition());
+            telemetry.addData("rb.getCurrentPosition()", rb.getCurrentPosition());
 
-        telemetry.addData("lfPower", lfPower);
-        telemetry.addData("lbPower", lbPower);
-        telemetry.addData("rfPower", rfPower);
-        telemetry.addData("rbPower", rbPower);
+            telemetry.addData("lfPower", lfPower);
+            telemetry.addData("lbPower", lbPower);
+            telemetry.addData("rfPower", rfPower);
+            telemetry.addData("rbPower", rbPower);
 
-        telemetry.addData("rfencodercounts", rfEncoderCounts);
-        telemetry.addData("lfencodercounts", lfEncoderCounts);
-        telemetry.addData("lbencodercounts", lbEncoderCounts);
-        telemetry.addData("rbEncoderCounts", rbEncoderCounts);
-        telemetry.update();
+            telemetry.addData("rfencodercounts", rfEncoderCounts);
+            telemetry.addData("lfencodercounts", lfEncoderCounts);
+            telemetry.addData("lbencodercounts", lbEncoderCounts);
+            telemetry.addData("rbEncoderCounts", rbEncoderCounts);
+            telemetry.update();
+        }
 
         rf.setPower(0);
         lf.setPower(0);
         lb.setPower(0);
         rb.setPower(0);
     }
+
     public void DrivetrainAutoMove(double distance, double speed, double direction, Telemetry telemetry){
         DrivetrainAutoMove(distance, speed, direction, 0, telemetry);
     }
