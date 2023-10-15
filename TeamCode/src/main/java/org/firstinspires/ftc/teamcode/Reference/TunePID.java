@@ -26,7 +26,7 @@ public class TunePID extends OpMode {
         controller = new PIDController(p, i, d);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        motor = hardwareMap.get(DcMotorEx.class, "lf");
+        motor = hardwareMap.get(DcMotorEx.class, "testm");
     }
 
     @Override
