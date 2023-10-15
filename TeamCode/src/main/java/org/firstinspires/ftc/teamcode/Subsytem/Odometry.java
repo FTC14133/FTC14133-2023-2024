@@ -20,8 +20,6 @@ import java.util.List;
 
 public class Odometry extends Thread{
 
-    private Drivetrain drivetrain=null;
-
     private static DcMotorEx paraEncoder;
     private static DcMotorEx perpEncoder;
 
@@ -94,13 +92,6 @@ public class Odometry extends Thread{
 
     public List<Object> Return_Coords(){
         return Arrays.asList(XPos, YPos);
-    }
-
-    public void GoToCoord(double targetx, double targety, double speed, double direction, Telemetry telemetry){
-        double realDirection = (360-currentAngle)+direction;
-        double distance = Math.sqrt(Math.pow(targetx-XPos, 2)+Math.pow(targety-YPos, 2));
-
-        drivetrain.DrivetrainAutoMove(distance, speed, realDirection, telemetry);
     }
 
     public void run(){
