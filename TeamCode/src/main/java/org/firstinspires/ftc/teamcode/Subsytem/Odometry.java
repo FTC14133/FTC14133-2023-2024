@@ -1,18 +1,12 @@
 package org.firstinspires.ftc.teamcode.Subsytem;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import java.util.Arrays;
@@ -27,19 +21,19 @@ public class Odometry extends Thread{
     IMU imu;
     // State used for updating telemetry
 
-    public double currentAngle = 0;
-    public double beforeAngle = 0;
+    private double currentAngle = 0;
+    private double beforeAngle = 0;
 
 
-    public double currentXPos = 0;
-    public double beforeXPos = 0;
+    private double currentXPos = 0;
+    private double beforeXPos = 0;
 
-    public double currentYPos = 0;
-    public double beforeYPos = 0;
+    private double currentYPos = 0;
+    private double beforeYPos = 0;
 
 
-    public double XPos = 0;
-    public double YPos = 0;
+    private double XPos = 0;
+    private double YPos = 0;
 
     public Odometry(HardwareMap hardwareMap){
 
@@ -90,7 +84,7 @@ public class Odometry extends Thread{
         }
     }
 
-    public List<Object> Return_Coords(){
+    public List<Double> Return_Coords(){
         return Arrays.asList(XPos, YPos);
     }
 

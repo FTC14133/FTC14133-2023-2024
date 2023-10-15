@@ -141,13 +141,10 @@ public class Drivetrain  {
         DrivetrainAutoMove(0, speed, 0, rotation, telemetry);
     }
 
-    public void GoToCoord(List<Double> curcoords, List<Double> tarcoords, double currentAngle, double speed, double direction, Telemetry telemetry){
+    public void GoToCoord(double targetx, double targety, double speed, double direction, List<Double> curcoords, double currentAngle, Telemetry telemetry){
 
         double XPos = curcoords.get(0);
         double YPos = curcoords.get(1);
-
-        double targetx = tarcoords.get(0);
-        double targety = tarcoords.get(1);
 
         double realDirection = (360-currentAngle)+direction;
         double distance = Math.sqrt(Math.pow(targetx-XPos, 2)+Math.pow(targety-YPos, 2));
