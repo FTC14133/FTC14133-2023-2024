@@ -2,7 +2,7 @@
 package org.firstinspires.ftc.teamcode.Subsytem;
 
 // Mecanum Drivetrain
-
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
@@ -17,13 +17,18 @@ import java.util.List;
 import java.util.Objects;
 
 public class Drivetrain  {
+
+    private PIDController controller;
+
+    public static double p = 0, i = 0, d = 0;
+
     // Instantiate the drivetrain motor variables
     private static DcMotorEx lf; //Back left motor of drivetrain
     private static DcMotorEx rf; //Back right motor of drivetrain
     private static DcMotorEx lb; //Front left motor of drivetrain
     private static DcMotorEx rb; //Front right motor of drivetrain
 
-    int tolerance = 4; // Encoder tolerance
+    int tolerance = 5; // Encoder tolerance
 
     final double countsperrev = 28; // Counts per rev of the motor
     final double wheelD =75.0/25.4; // Diameter of the wheel (in inches)
@@ -45,9 +50,11 @@ public class Drivetrain  {
         rb.setDirection(DcMotorEx.Direction.FORWARD);
         lf.setDirection(DcMotorEx.Direction.FORWARD);
         rf.setDirection(DcMotorEx.Direction.FORWARD);
+
+        controller = new PIDController(p, i, d);
     }
 
-    public void DrivetrainAutoMove(double distance, double speed, double direction, double rotation, Telemetry telemetry) {
+    public void DrivetrainAutoMove(double distance, double direction, double rotation, Telemetry telemetry) {
         /*
          * Commands the robot to move a certain direction for a certain distance
          * Distance in inches, Speed in in/s, Direction in degrees (Front of robot is 0 deg, CCW is positive), Rotation in degrees (CCW is pos)
@@ -63,25 +70,6 @@ public class Drivetrain  {
         lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rf.setTargetPositionTolerance(tolerance);
-        lf.setTargetPositionTolerance(tolerance);
-        lb.setTargetPositionTolerance(tolerance);
-        rb.setTargetPositionTolerance(tolerance);
-
-        double rotPower = Math.min(speed, (speed*rotation)); // Checking if we have any rotation (if 0 speed is 0)
-
-        double lfPower = (((forward + strafe)) + rotPower);      //Speed for leftfront
-        double lbPower = (((forward - strafe)) + rotPower);      //Speed for leftback
-        double rfPower = (((forward - strafe)) - rotPower);      //Speed for rightfront
-        double rbPower = (((forward + strafe)) - rotPower);      //Speed for rightback
-
-        //if the power is over 1
-        double denominator = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
-
-        lfPower = (lfPower/denominator) * speed;
-        lbPower = (lbPower/denominator) * speed;
-        rfPower = (rfPower/denominator) * speed;
-        rbPower = (rbPower/denominator) * speed;
 
         double lfD = ((forward + strafe) + (rotation * inchesperdegrotation));      //distance for leftfront
         double lbD = ((forward - strafe) + (rotation * inchesperdegrotation));      //distance for leftback
@@ -94,23 +82,19 @@ public class Drivetrain  {
         int lbEncoderCounts = (int)(lbD * countsperin);
         int rbEncoderCounts = (int)(rbD * countsperin);
 
-        //Setting where the motors need to go
-        rf.setTargetPosition(rfEncoderCounts);
-        lf.setTargetPosition(lfEncoderCounts);
-        lb.setTargetPosition(lbEncoderCounts);
-        rb.setTargetPosition(rbEncoderCounts);
-        //How fast the motors need to go
-        rf.setPower(rfPower);
-        lf.setPower(lfPower);
-        lb.setPower(lbPower);
-        rb.setPower(rbPower);
-        // Telling the motors to go to target pos
-        rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while ((!(lf.getCurrentPosition()>lfD-tolerance && lf.getCurrentPosition()<lfD+tolerance)) && (!(rf.getCurrentPosition()>rfD-tolerance && rf.getCurrentPosition()<rfD+tolerance))){
 
-        while (lf.isBusy() || rf.isBusy()/* || lb.isBusy() || rb.isBusy()*/) {
+            double lfPower = controller.calculate(lf.getCurrentPosition(), lfD);;      //Speed for leftfront
+            double lbPower = controller.calculate(lb.getCurrentPosition(), lbD);;      //Speed for leftback
+            double rfPower = controller.calculate(rf.getCurrentPosition(), rfD);;      //Speed for rightfront
+            double rbPower = controller.calculate(rb.getCurrentPosition(), rbD);;      //Speed for rightback
+
+            //How fast the motors need to go
+            rf.setPower(rfPower);
+            lf.setPower(lfPower);
+            lb.setPower(lbPower);
+            rb.setPower(rbPower);
+
             telemetry.addData("rf.getCurrentPosition()", rf.getCurrentPosition());
             telemetry.addData("lf.getCurrentPosition()", lf.getCurrentPosition());
             telemetry.addData("lb.getCurrentPosition()", lb.getCurrentPosition());
@@ -133,12 +117,12 @@ public class Drivetrain  {
         lb.setPower(0);
         rb.setPower(0);
     }
-    public void DrivetrainAutoMove(double distance, double speed, double direction, Telemetry telemetry){
-        DrivetrainAutoMove(distance, speed, direction, 0, telemetry);
+    public void DrivetrainAutoMove(double distance, double direction, Telemetry telemetry){
+        DrivetrainAutoMove(distance, direction, 0, telemetry);
     }
 
-    public void DrivetrainAutoMove(double speed, double rotation, Telemetry telemetry){
-        DrivetrainAutoMove(0, speed, 0, rotation, telemetry);
+    public void DrivetrainAutoMove(double rotation, Telemetry telemetry){
+        DrivetrainAutoMove(0, 0, rotation, telemetry);
     }
 
     public void GoToCoord(List<Double> curcoords, List<Double> tarcoords, double currentAngle, double speed, double direction, Telemetry telemetry){

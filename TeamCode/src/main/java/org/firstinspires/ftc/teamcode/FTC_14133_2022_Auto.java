@@ -33,11 +33,11 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
         //drivetrain.GoToCoord();
 
-        drivetrain.DrivetrainAutoMove(20, 0.5, 0, telemetry);
+        drivetrain.DrivetrainAutoMove(20, 0, telemetry);
         drivetrain.DrivetrainAutoMove(0.5, 90, telemetry);
-        drivetrain.DrivetrainAutoMove(5, 0.5, 0, telemetry);
+        drivetrain.DrivetrainAutoMove(5, 0, telemetry);
         drivetrain.DrivetrainAutoMove(0.5, 135, telemetry);
-        drivetrain.DrivetrainAutoMove(5, 0.5, 0, telemetry);
+        drivetrain.DrivetrainAutoMove(5, 0, telemetry);
         //drivetrain.DrivetrainAutoMove(0.25, 90, telemetry);
 
         telemetry.update();
