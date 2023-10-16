@@ -45,111 +45,77 @@ public class Drivetrain  {
         rb.setDirection(DcMotorEx.Direction.FORWARD);
         lf.setDirection(DcMotorEx.Direction.FORWARD);
         rf.setDirection(DcMotorEx.Direction.FORWARD);
-    }
 
-    public void DrivetrainAutoMove(double distance, double speed, double direction, double rotation, Telemetry telemetry) {
-        /*
-         * Commands the robot to move a certain direction for a certain distance
-         * Distance in inches, Speed in in/s, Direction in degrees (Front of robot is 0 deg, CCW is positive), Rotation in degrees (CCW is pos)
-         */
-
-        double angle = Math.toRadians(direction); // Converting direction to radians for sin and cos functions
-
-        double forward = Math.cos(angle)*distance; // Getting how much we need to move forward with cos (distance is hypot)
-        double strafe = Math.sin(angle)*distance;// Getting how much we need to move strafe with cos (distance is hypot)
-
-        //Says that the current pos is 0
-        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //Setting tolerance (stop if close to target)
         rf.setTargetPositionTolerance(tolerance);
         lf.setTargetPositionTolerance(tolerance);
         lb.setTargetPositionTolerance(tolerance);
         rb.setTargetPositionTolerance(tolerance);
+    }
 
-        double rotPower = Math.min(speed, (speed*rotation)); // Checking if we have any rotation (if 0 speed is 0)
+    public void GoToCoord(double targetx, double targety, double fieldDirection, double speed, Odometry odometry) {
 
-        double lfPower = (((forward + strafe)) + rotPower);      //Speed for leftfront
-        double lbPower = (((forward - strafe)) + rotPower);      //Speed for leftback
-        double rfPower = (((forward - strafe)) - rotPower);      //Speed for rightfront
-        double rbPower = (((forward + strafe)) - rotPower);      //Speed for rightback
+        boolean moving = true;
 
-        //if the power is over 1
-        double denominator = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
+        while (moving){
 
-        lfPower = (lfPower/denominator) * speed;
-        lbPower = (lbPower/denominator) * speed;
-        rfPower = (rfPower/denominator) * speed;
-        rbPower = (rbPower/denominator) * speed;
+            List<Double> cur_coord = odometry.Return_Coords();
+            double XPos = cur_coord.get(0);
+            double YPos = cur_coord.get(1);
 
-        double lfD = ((forward + strafe) + (rotation * inchesperdegrotation));      //distance for leftfront
-        double lbD = ((forward - strafe) + (rotation * inchesperdegrotation));      //distance for leftback
-        double rfD = ((forward - strafe) - (rotation * inchesperdegrotation));      //distance for rightfront
-        double rbD = ((forward + strafe) - (rotation * inchesperdegrotation));      //distance for rightback
+            double robotCurAngle = odometry.Return_Angle(false);
+            double robotAngle = (360-robotCurAngle)+fieldDirection;
+            double robotAngleRad = Math.toRadians(robotAngle);
 
-        // Converting inches to encoder counts
-        int rfEncoderCounts = (int)(rfD * countsperin);
-        int lfEncoderCounts = (int)(lfD * countsperin);
-        int lbEncoderCounts = (int)(lbD * countsperin);
-        int rbEncoderCounts = (int)(rbD * countsperin);
+            double distance = Math.sqrt(Math.pow(targetx-XPos, 2)+Math.pow(targety-YPos, 2));
 
-        //Setting where the motors need to go
-        rf.setTargetPosition(rfEncoderCounts);
-        lf.setTargetPosition(lfEncoderCounts);
-        lb.setTargetPosition(lbEncoderCounts);
-        rb.setTargetPosition(rbEncoderCounts);
-        //How fast the motors need to go
-        rf.setPower(rfPower);
-        lf.setPower(lfPower);
-        lb.setPower(lbPower);
-        rb.setPower(rbPower);
-        // Telling the motors to go to target pos
-        rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            double forward = Math.cos(robotAngleRad)*distance;
+            double strafe = Math.sin(robotAngleRad)*distance;
 
-        while (lf.isBusy() || rf.isBusy()/* || lb.isBusy() || rb.isBusy()*/) {
-            telemetry.addData("rf.getCurrentPosition()", rf.getCurrentPosition());
-            telemetry.addData("lf.getCurrentPosition()", lf.getCurrentPosition());
-            telemetry.addData("lb.getCurrentPosition()", lb.getCurrentPosition());
-            telemetry.addData("rb.getCurrentPosition()", rb.getCurrentPosition());
+            double lfD = ((forward + strafe) + (robotAngleRad * inchesperdegrotation));      //distance for leftfront
+            double lbD = ((forward - strafe) + (robotAngleRad * inchesperdegrotation));      //distance for leftback
+            double rfD = ((forward - strafe) - (robotAngleRad * inchesperdegrotation));      //distance for rightfront
+            double rbD = ((forward + strafe) - (robotAngleRad * inchesperdegrotation));      //distance for rightback
 
-            telemetry.addData("lfPower", lfPower);
-            telemetry.addData("lbPower", lbPower);
-            telemetry.addData("rfPower", rfPower);
-            telemetry.addData("rbPower", rbPower);
+            // Converting inches to encoder counts
+            int rfEncoderCounts = (int)(rfD * countsperin);
+            int lfEncoderCounts = (int)(lfD * countsperin);
+            int lbEncoderCounts = (int)(lbD * countsperin);
+            int rbEncoderCounts = (int)(rbD * countsperin);
 
-            telemetry.addData("rfencodercounts", rfEncoderCounts);
-            telemetry.addData("lfencodercounts", lfEncoderCounts);
-            telemetry.addData("lbencodercounts", lbEncoderCounts);
-            telemetry.addData("rbEncoderCounts", rbEncoderCounts);
-            telemetry.update();
+            double rotPower = Math.min(speed, (speed*(robotCurAngle-robotAngle)));
+
+            double lfPower = (((forward + strafe)) + rotPower);
+            double lbPower = (((forward - strafe)) + rotPower);
+            double rfPower = (((forward - strafe)) - rotPower);
+            double rbPower = (((forward + strafe)) - rotPower);
+
+            //Setting current pos to 0
+            rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            lb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            //Setting where the motors need to go
+            rf.setTargetPosition(rfEncoderCounts);
+            lf.setTargetPosition(lfEncoderCounts);
+            lb.setTargetPosition(lbEncoderCounts);
+            rb.setTargetPosition(rbEncoderCounts);
+            //How fast the motors need to go
+            rf.setPower(rfPower);
+            lf.setPower(lfPower);
+            lb.setPower(lbPower);
+            rb.setPower(rbPower);
+            // Telling the motors to go to target pos
+            rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            if ((!(lf.isBusy())) && (!(rf.isBusy()))){
+                moving = false;
+            }
         }
 
-        rf.setPower(0);
-        lf.setPower(0);
-        lb.setPower(0);
-        rb.setPower(0);
-    }
-    public void DrivetrainAutoMove(double distance, double speed, double direction, Telemetry telemetry){
-        DrivetrainAutoMove(distance, speed, direction, 0, telemetry);
-    }
-
-    public void DrivetrainAutoMove(double speed, double rotation, Telemetry telemetry){
-        DrivetrainAutoMove(0, speed, 0, rotation, telemetry);
-    }
-
-    public void GoToCoord(double targetx, double targety, double speed, double direction, List<Double> curcoords, double currentAngle, Telemetry telemetry){
-
-        double XPos = curcoords.get(0);
-        double YPos = curcoords.get(1);
-
-        double realDirection = (360-currentAngle)+direction;
-        double distance = Math.sqrt(Math.pow(targetx-XPos, 2)+Math.pow(targety-YPos, 2));
-
-        DrivetrainAutoMove(distance, speed, realDirection, telemetry);
     }
 
     public void Teleop(Gamepad gamepad1, Telemetry telemetry){ //Code to be run in Teleop Mode void Loop at top level
