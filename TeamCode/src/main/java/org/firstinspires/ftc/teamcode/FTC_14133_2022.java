@@ -34,7 +34,7 @@ public class  FTC_14133_2022 extends OpMode {
      drivetrain.Teleop(gamepad1, telemetry);
      odometry.run();
 
-     telemetry.addData("Robot Coords:", odometry.Return_Coords());
+     telemetry.addData("Robot Coords:", odometry.Return_Coords(true));
      telemetry.update();
 
  }

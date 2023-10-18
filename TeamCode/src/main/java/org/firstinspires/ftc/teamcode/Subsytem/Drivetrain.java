@@ -53,29 +53,30 @@ public class Drivetrain  {
         rb.setTargetPositionTolerance(tolerance);
     }
 
-    public void GoToCoord(double targetx, double targety, double fieldDirection, double speed, Odometry odometry) {
+    public void GoToCoord(double targetx, double targety, double fieldTarAngle, double speed, Odometry odometry) {
 
         boolean moving = true;
 
         while (moving){
 
-            List<Double> cur_coord = odometry.Return_Coords();
+            List<Double> cur_coord = odometry.Return_Coords(true);
             double XPos = cur_coord.get(0);
             double YPos = cur_coord.get(1);
 
             double robotCurAngle = odometry.Return_Angle(false);
-            double robotAngle = (360-robotCurAngle)+fieldDirection;
-            double robotAngleRad = Math.toRadians(robotAngle);
+            double robotTarAngle = (360-robotCurAngle)+fieldTarAngle;
+            double robotTarAngleRad = Math.toRadians(robotTarAngle);
 
             double distance = Math.sqrt(Math.pow(targetx-XPos, 2)+Math.pow(targety-YPos, 2));
 
-            double forward = Math.cos(robotAngleRad)*distance;
-            double strafe = Math.sin(robotAngleRad)*distance;
+            double forward = Math.cos(robotTarAngleRad)*distance;
+            double strafe = Math.sin(robotTarAngleRad)*distance;
+            double rotate = (robotTarAngleRad * inchesperdegrotation);
 
-            double lfD = ((forward + strafe) + (robotAngleRad * inchesperdegrotation));      //distance for leftfront
-            double lbD = ((forward - strafe) + (robotAngleRad * inchesperdegrotation));      //distance for leftback
-            double rfD = ((forward - strafe) - (robotAngleRad * inchesperdegrotation));      //distance for rightfront
-            double rbD = ((forward + strafe) - (robotAngleRad * inchesperdegrotation));      //distance for rightback
+            double lfD = ((forward + strafe) + rotate);      //distance for leftfront
+            double lbD = ((forward - strafe) + rotate);      //distance for leftback
+            double rfD = ((forward - strafe) - rotate);      //distance for rightfront
+            double rbD = ((forward + strafe) - rotate);      //distance for rightback
 
             // Converting inches to encoder counts
             int rfEncoderCounts = (int)(rfD * countsperin);
@@ -83,12 +84,23 @@ public class Drivetrain  {
             int lbEncoderCounts = (int)(lbD * countsperin);
             int rbEncoderCounts = (int)(rbD * countsperin);
 
-            double rotPower = Math.min(speed, (speed*(robotCurAngle-robotAngle)));
+            double rotPower = (rotate/distance);
+
+            if (rotPower == Double.NaN){
+                rotPower = rotate;
+            }
 
             double lfPower = (((forward + strafe)) + rotPower);
             double lbPower = (((forward - strafe)) + rotPower);
             double rfPower = (((forward - strafe)) - rotPower);
             double rbPower = (((forward + strafe)) - rotPower);
+
+            double denominator = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
+
+            lfPower = (lfPower/denominator) * speed;
+            lbPower = (lbPower/denominator) * speed;
+            rfPower = (rfPower/denominator) * speed;
+            rbPower = (rbPower/denominator) * speed;
 
             //Setting current pos to 0
             rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -35,6 +35,12 @@ public class Odometry extends Thread{
     private double XPos = 0;
     private double YPos = 0;
 
+    final double countsperrev = 28; // Counts per rev of the motor
+    final double wheelD =75.0/25.4; // Diameter of the wheel (in inches)
+    final double gearratio=(84.0/29.0)*(84.0/29.0)*(76.0/21.0); //Ratio of the entire drivetrain from the motor to the wheel
+
+    final double countsperin = countsperrev*(gearratio)*(1/(Math.PI*wheelD));
+
     public Odometry(HardwareMap hardwareMap){
 
         paraEncoder = hardwareMap.get(DcMotorEx.class, "paraEncoder");
@@ -84,8 +90,12 @@ public class Odometry extends Thread{
         }
     }
 
-    public List<Double> Return_Coords(){
-        return Arrays.asList(XPos, YPos);
+    public List<Double> Return_Coords(boolean inches){
+        if (inches){
+            return Arrays.asList(XPos*countsperin, YPos*countsperin);
+        }else{
+            return Arrays.asList(XPos, YPos);
+        }
     }
 
     public void run(){
