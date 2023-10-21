@@ -20,8 +20,6 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
         drivetrain = new Drivetrain(hardwareMap);
         odometry = new Odometry(hardwareMap);
 
-        odometry.start();
-
         telemetry.addData("Object Creation", "Done");
         telemetry.update();
     }
@@ -36,21 +34,10 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
         telemetry.addData("Object", "Passed waitForStart");
 
-        drivetrain.GoToCoord(5, 5, 0.5, 45, odometry.Return_Coords(), odometry.Return_Angle(false), telemetry);
-        /*
-        drivetrain.DrivetrainAutoMove(20, 0.5, 0, telemetry);
-        drivetrain.DrivetrainAutoMove(0.5, 90, telemetry);
-        drivetrain.DrivetrainAutoMove(5, 0.5, 0, telemetry);
-        drivetrain.DrivetrainAutoMove(0.5, 135, telemetry);
-        drivetrain.DrivetrainAutoMove(5, 0.5, 0, telemetry);
-        //drivetrain.DrivetrainAutoMove(0.25, 90, telemetry);
+        drivetrain.GoToCoord(5, 5, 0.5, odometry, telemetry);
 
-         */
-
+        telemetry.addData("pos", odometry.Return_Coords());
         telemetry.update();
-
-        odometry.interrupt();
-        super.stop();
-
+        sleep(10000);
     }
 }

@@ -35,6 +35,7 @@ public class  FTC_14133_2022 extends OpMode {
      odometry.run();
 
      telemetry.addData("Robot Coords:", odometry.Return_Coords());
+     telemetry.addData("Robot Angle:", odometry.Return_Angle(false));
      telemetry.update();
 
  }

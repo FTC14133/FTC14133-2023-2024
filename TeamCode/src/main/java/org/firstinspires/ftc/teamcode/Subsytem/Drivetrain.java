@@ -47,7 +47,7 @@ public class Drivetrain  {
         rf.setDirection(DcMotorEx.Direction.FORWARD);
     }
 
-    public void DrivetrainAutoMove(double distance, double speed, double direction, double rotation, Telemetry telemetry) {
+    public void DrivetrainAutoMove(double distance, double speed, double direction, double rotation, Odometry odometry, Telemetry telemetry) {
         /*
          * Commands the robot to move a certain direction for a certain distance
          * Distance in inches, Speed in in/s, Direction in degrees (Front of robot is 0 deg, CCW is positive), Rotation in degrees (CCW is pos)
@@ -111,7 +111,11 @@ public class Drivetrain  {
         rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         while (lf.isBusy() || rf.isBusy()/* || lb.isBusy() || rb.isBusy()*/) {
-            telemetry.addData("rf.getCurrentPosition()", rf.getCurrentPosition());
+
+            odometry.run();
+            telemetry.addData("pos", odometry.Return_Coords());
+
+            /*telemetry.addData("rf.getCurrentPosition()", rf.getCurrentPosition());
             telemetry.addData("lf.getCurrentPosition()", lf.getCurrentPosition());
             telemetry.addData("lb.getCurrentPosition()", lb.getCurrentPosition());
             telemetry.addData("rb.getCurrentPosition()", rb.getCurrentPosition());
@@ -125,7 +129,7 @@ public class Drivetrain  {
             telemetry.addData("lfencodercounts", lfEncoderCounts);
             telemetry.addData("lbencodercounts", lbEncoderCounts);
             telemetry.addData("rbEncoderCounts", rbEncoderCounts);
-            telemetry.update();
+            telemetry.update();*/
         }
 
         rf.setPower(0);
@@ -133,29 +137,27 @@ public class Drivetrain  {
         lb.setPower(0);
         rb.setPower(0);
     }
-    public void DrivetrainAutoMove(double distance, double speed, double direction, Telemetry telemetry){
-        DrivetrainAutoMove(distance, speed, direction, 0, telemetry);
-    }
 
-    public void DrivetrainAutoMove(double speed, double rotation, Telemetry telemetry){
-        DrivetrainAutoMove(0, speed, 0, rotation, telemetry);
-    }
+    public void GoToCoord(double targetx, double targety, double speed, Odometry odometry, Telemetry telemetry){
 
-    public void GoToCoord(double targetx, double targety, double speed, double direction, List<Double> curcoords, double currentAngle, Telemetry telemetry){
-
+        List<Double> curcoords = odometry.Return_Coords();
         double XPos = curcoords.get(0);
         double YPos = curcoords.get(1);
+        double curAngle = odometry.Return_Angle(false);
 
-        double realDirection = (360-currentAngle)+direction;
+        double fieldSlope = (targety-YPos)/(targetx-XPos);
+        double fieldDirection = Math.atan(fieldSlope);
+        double robotDirection = (360-curAngle)+fieldDirection;
+
         double distance = Math.sqrt(Math.pow(targetx-XPos, 2)+Math.pow(targety-YPos, 2));
 
-        DrivetrainAutoMove(distance, speed, realDirection, telemetry);
+        DrivetrainAutoMove(distance, speed, robotDirection, 0, odometry, telemetry);
     }
 
     public void Teleop(Gamepad gamepad1, Telemetry telemetry){ //Code to be run in Teleop Mode void Loop at top level
-        double leftPowerY = -gamepad1.left_stick_y;      //find the value of y axis on the left joystick
-        double leftPowerX = gamepad1.left_stick_x;      //find the value of x axis on the left joystick
-        double rightPowerX = gamepad1.right_stick_x*rotationK;     //find the value of x axis on the right joystick
+        double leftPowerY = -gamepad1.left_stick_y*0.5;      //find the value of y axis on the left joystick
+        double leftPowerX = gamepad1.left_stick_x*0.5;      //find the value of x axis on the left joystick
+        double rightPowerX = gamepad1.right_stick_x*rotationK*0.75;     //find the value of x axis on the right joystick
 
         double denominator = Math.max(Math.abs(leftPowerY) + Math.abs(leftPowerX) + Math.abs(rightPowerX), 1);
 
