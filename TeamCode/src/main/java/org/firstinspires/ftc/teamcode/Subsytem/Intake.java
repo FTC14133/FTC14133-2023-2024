@@ -13,10 +13,10 @@ public class Intake {
     // Instantiate the motor variables
     static DcMotorEx intakeSucker;
     static CRServo intakePivot;
-    AnalogInput PNP;
+    AnalogInput pivotIntakePNP;
 
-    private PIDController controller;
-    public static double p = 0, i = 0, d = 0; // todo: tune intake rot pid
+    private PIDController controller; // todo: make ff
+    public static double p = 0, i = 0, d = 0; // todo: tune intake pivot pid
 
     //boolean Possession = true; //Variable telling whether we have possession of a game piece or not
 
@@ -30,7 +30,7 @@ public class Intake {
     public Intake(HardwareMap hardwareMap){                 // Motor Mapping
         intakeSucker = hardwareMap.get(DcMotorEx.class, "intakeSuck");
         intakePivot = hardwareMap.get(CRServo.class, "intakePiv");
-        PNP = hardwareMap.get(AnalogInput.class, "intakePNP");
+        pivotIntakePNP = hardwareMap.get(AnalogInput.class, "intakePNP");
 
         controller.setPID(p, i, d);
 
@@ -65,7 +65,7 @@ public class Intake {
 
     public class Pivot {
         public double getIntakeAngle(){
-            double PNPVoltage = PNP.getVoltage();
+            double PNPVoltage = pivotIntakePNP.getVoltage();
             double PNPAngle = degpervoltage*PNPVoltage;
 
             return PNPAngle;
