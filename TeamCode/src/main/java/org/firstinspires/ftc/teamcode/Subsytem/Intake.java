@@ -22,7 +22,7 @@ public class Intake {
 
     int teleopState = 0;
 
-    final double rotationSpeed = 1; // todo: figure out good speed
+    final double suckerSpeed = 1; // todo: figure out good speed
     final double degpervoltage = 270/3.3;
 
     int intakeTargetPos = 0; // todo: see what starting pos we want
@@ -38,7 +38,7 @@ public class Intake {
 
     public class Sucker {
         private void runIntake(double intakeState){ // 1 is intake, 0 is off, -1 is outtake
-            intakeSucker.setPower(rotationSpeed*intakeState);
+            intakeSucker.setPower(suckerSpeed *intakeState);
         }
 
         public void Teleop(Gamepad gamepad2, Telemetry telemetry) { //Code to be run in Op Mode void Loop at top level
@@ -66,13 +66,12 @@ public class Intake {
     public class Pivot {
         public double getIntakeAngle(){
             double PNPVoltage = pivotIntakePNP.getVoltage();
-            double PNPAngle = degpervoltage*PNPVoltage;
 
-            return PNPAngle;
+            return degpervoltage*PNPVoltage;
         }
 
-        public void SetAngle(int position){
-            intakeTargetPos = position;
+        public void GoToAngle(int angle){
+            intakeTargetPos = angle;
 
             double currentPos = getIntakeAngle();
             double pid = controller.calculate(currentPos, intakeTargetPos);
