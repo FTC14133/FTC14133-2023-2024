@@ -18,52 +18,16 @@ public class Autonomous extends LinearOpMode {
         // Creating Drivetrain
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        // Auto Selector
-        String alliance = "blue";
-        String spike = "left";
-        String side = "close";
-        String lrFMode = "top";
+        String[] selectedArray = autoSelector();
 
-        while (!opModeIsActive() && !isStopRequested()){
-            if (gamepad1.x){
-                alliance = "blue";
-            }else if (gamepad1.b){
-                alliance = "red";
-            }
-            telemetry.addData("Select Alliance (Gamepad1 X = Blue, Gamepad1 B = Red)", "");
-            telemetry.addData("Current Alliance Selected : ", alliance.toUpperCase());
-            telemetry.addData("", "");
+        String alliance = selectedArray[0];
+        String spike = selectedArray[1];
+        String side = selectedArray[2];
+        String lrFMode =  selectedArray[3];
 
-            if (gamepad1.dpad_left){
-                spike = "left";
-            }else if (gamepad1.dpad_right){
-                spike = "right";
-            }else if (gamepad1.dpad_up){
-                spike = "center";
-            }
-            telemetry.addData("Select Spike Mark (Gamepad1 D-PAD Left = Left Spike, Gamepad1 D-PAD Up = Center Spike, Gamepad1 D-PAD Right = Right Spike)", "");
-            telemetry.addData("Current Spike Mark Selected : ", spike.toUpperCase());
-            telemetry.addData("", "");
-
-            if (gamepad1.y){
-                side = "far";
-            }else if (gamepad1.a){
-                side = "close";
-            }
-            telemetry.addData("Select Side (Gamepad1 Y = Far, Gamepad1 A = Close)", "");
-            telemetry.addData("Current Side Selected : ", side.toUpperCase());
-            telemetry.addData("", "");
-
-            if (gamepad1.right_bumper){
-                lrFMode = "top";
-            }else if (gamepad1.left_bumper){
-                lrFMode = "bottom";
-            }
-            telemetry.addData("Select Left/Right Far Mode (Gamepad1 Right Bumper = Top, Gamepad1 Left Bumper = Bottom)", "");
-            telemetry.addData("Current Left/Right Far Mode Selected : ", lrFMode.toUpperCase());
-            telemetry.addData("", "");
-
-            telemetry.update();
+        switch (alliance){
+            case "red":
+                switch (side)
         }
 
         Pose2d startPose = new Pose2d(-35, -62, Math.toRadians(90));
