@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems.TeamElementDetection;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -39,9 +38,13 @@ public class TeamElementSubsystem {
         });
     }
 
-    public int ElementDetection(Telemetry telemetry) {
-        zone = SplitAveragePipeline.get_element_zone();
-        telemetry.addData("Element in zone", zone);
+    public void setAlliance(String alliance){
+        splitAveragePipeline.setAlliancePipe(alliance);
+    }
+
+    public int elementDetection(Telemetry telemetry) {
+        zone = splitAveragePipeline.get_element_zone();
+        telemetry.addData("Element Zone", zone);
         return zone;
     }
 }

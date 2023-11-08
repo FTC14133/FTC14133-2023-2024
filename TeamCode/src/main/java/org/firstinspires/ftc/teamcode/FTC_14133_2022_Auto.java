@@ -29,8 +29,22 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
         HardwareStart();
 
+        String curAlliance = "red";
+
         while (!opModeIsActive() && !isStopRequested()){
-            element_zone = teamElementDetection.ElementDetection(telemetry);
+            element_zone = teamElementDetection.elementDetection(telemetry);
+
+            if (gamepad1.x){
+                curAlliance = "blue";
+            }else if (gamepad1.b){
+                curAlliance = "red";
+            }
+            teamElementDetection.setAlliance(curAlliance);
+            telemetry.addData("Select Alliance (Gamepad1 X = Blue, Gamepad1 B = Red)", "");
+            telemetry.addData("Current Alliance Selected : ", curAlliance.toUpperCase());
+
+
+            telemetry.update();
         }
 
         telemetry.addData("Object", "Passed waitForStart");

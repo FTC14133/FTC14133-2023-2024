@@ -16,7 +16,7 @@ public class SplitAveragePipeline extends OpenCvPipeline {
     int CAMERA_WIDTH = 800/*800*/;
     int CAMERA_HEIGHT = 448/*448*/;
 
-    final List<Integer> ELEMENT_COLOR = Arrays.asList(255, 255, 0); //(red, green, blue)
+    List<Integer> ELEMENT_COLOR = Arrays.asList(255, 0, 0); //(red, green, blue)
 
     int line1x = CAMERA_WIDTH / 3;
     int line2x = (CAMERA_WIDTH / 3) * 2;
@@ -38,9 +38,13 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
         //Defining Zones
         //Rect(top left x, top left y, bottom right x, bottom right y)
-        Mat zone1 = input.submat(new Rect(0, 0, line1x, CAMERA_HEIGHT));
-        Mat zone2 = input.submat(new Rect(line1x, 0, line2x - line1x, CAMERA_HEIGHT));
-        Mat zone3 = input.submat(new Rect(line2x, 0, CAMERA_WIDTH - line2x, CAMERA_HEIGHT));
+        //Mat zone1 = input.submat(new Rect(0, 0, line1x, CAMERA_HEIGHT));
+        //Mat zone2 = input.submat(new Rect(line1x, 0, line2x - line1x, CAMERA_HEIGHT));
+        //Mat zone3 = input.submat(new Rect(line2x, 0, CAMERA_WIDTH - line2x, CAMERA_HEIGHT));
+
+        Mat zone1 = input.submat(new Rect(0, 180, 115, 115));
+        Mat zone2 = input.submat(new Rect(316, 180, 115, 115));
+        Mat zone3 = input.submat(new Rect(660, 180, 115, 115));
 
         //Averaging the colors in the zones
         Scalar avgColor1 = Core.mean(zone1);
@@ -93,7 +97,15 @@ public class SplitAveragePipeline extends OpenCvPipeline {
         return Math.sqrt(Math.pow((r1 - r2), 2) + Math.pow((g1 - g2), 2) + Math.pow((b1 - b2), 2));
     }
 
-    public static int get_element_zone(){
+    public void setAlliancePipe(String alliance){
+        if (alliance.equals("red")){
+            ELEMENT_COLOR = Arrays.asList(255, 0, 0);
+        }else{
+            ELEMENT_COLOR = Arrays.asList(0, 0, 255);
+        }
+    }
+
+    public int get_element_zone(){
         return color_zone;
     }
 
