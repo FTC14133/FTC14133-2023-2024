@@ -4,6 +4,8 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -15,6 +17,8 @@ public class Arm {
     DcMotorEx armLM, armRM;
 
     AnalogInput armPNP;
+
+    DigitalChannel armLimit;
 
     private PIDController armController; // todo: make ff
     public static double armP = 0, armI = 0, armD = 0; // todo: tune pid
@@ -37,10 +41,15 @@ public class Arm {
         slideM = hardwareMap.get(DcMotorEx.class, "slideM");
         slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        armLM = hardwareMap.get(DcMotorEx.class, "PivotArmLM");
-        armRM = hardwareMap.get(DcMotorEx.class, "PivotArmRM");
+        armLM = hardwareMap.get(DcMotorEx.class, "armLM");
+        armRM = hardwareMap.get(DcMotorEx.class, "armRM");
 
-        armPNP = hardwareMap.get(AnalogInput.class, "intakePNP");
+        armLM.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        armPNP = hardwareMap.get(AnalogInput.class, "armPNP");
+
+        armLimit = hardwareMap.get(DigitalChannel.class, "armLimit");
+        armLimit.setMode(DigitalChannel.Mode.INPUT);
 
         armController.setPID(armP, armI, armD);
         slideController.setPID(slideP, slideI, slideD);
@@ -101,11 +110,21 @@ public class Arm {
         double armPower = armController.calculate(getArmAngle(), armTargetPos);
         double slidePower = slideController.calculate(getSlideLenght(), slideTargetPos);
 
+        if (armLimit.getState()){
+            slidePower = 0;
+        }
+
         armLM.setPower(armPower);
         armRM.setPower(armPower);
 
         slideM.setPower(slidePower);
 
+    }
+
+    public void GoToPositionAuto(int position){
+        while (!(getArmAngle() >= armTargetPos-5 && getArmAngle() <= armTargetPos+5) && !(getSlideLenght() >= slideTargetPos-5 && getSlideLenght() <= slideTargetPos+5)){
+            GoToPosition(position);
+        }
     }
 
     public double getArmAngle(){
@@ -115,6 +134,10 @@ public class Arm {
 
     public double getSlideLenght(){
         return slideM.getCurrentPosition();
+    }
+
+    public double getArmSlidePos(){
+        return armSlidePos;
     }
 
 

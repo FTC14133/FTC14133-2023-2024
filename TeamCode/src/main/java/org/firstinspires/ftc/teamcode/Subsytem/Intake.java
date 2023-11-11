@@ -25,7 +25,9 @@ public class Intake {
     final double suckerSpeed = 1; // todo: figure out good speed
     final double degpervoltage = 270/3.3;
 
-    int intakeTargetPos = 0; // todo: see what starting pos we want
+    double  intakeTargetPos = 0; // todo: see what starting pos we want
+    public Catcher objcatcher;
+    public Pivot objpivot;
 
     public Intake(HardwareMap hardwareMap){                 // Motor Mapping
         intakeSucker = hardwareMap.get(DcMotorEx.class, "intakeSuck");
@@ -34,9 +36,13 @@ public class Intake {
 
         controller.setPID(p, i, d);
 
+        objcatcher = new Catcher();
+        objpivot = new Pivot();
+
+
     }
 
-    public class Sucker {
+    public class Catcher {
         private void runIntake(double intakeState){ // 1 is intake, 0 is off, -1 is outtake
             intakeSucker.setPower(suckerSpeed *intakeState);
         }
@@ -70,7 +76,7 @@ public class Intake {
             return degpervoltage*PNPVoltage;
         }
 
-        public void GoToAngle(int angle){
+        public void GoToAngle(double angle){
             intakeTargetPos = angle;
 
             double currentPos = getIntakeAngle();

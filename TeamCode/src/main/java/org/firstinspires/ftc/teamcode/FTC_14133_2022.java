@@ -3,19 +3,22 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsytem.Drivetrain;
+import org.firstinspires.ftc.teamcode.Subsytem.Arm;
+import org.firstinspires.ftc.teamcode.Subsytem.Intake;
 
 @TeleOp(name="FTC_14133_2022", group="Iterative Opmode") // Labels program in Driver station Selection
 
 public class  FTC_14133_2022 extends OpMode {
 
-    private Drivetrain drivetrain=null;
+    private Arm arm=null;
+    private Intake intake=null;
 
 
  public void init() {
 
-     drivetrain = new Drivetrain(hardwareMap);
+     arm = new Arm(hardwareMap);
 
+     intake = new Intake(hardwareMap);
 
  }
 
@@ -28,7 +31,13 @@ public class  FTC_14133_2022 extends OpMode {
  public void loop() {
      telemetry.addData("Status", "Looping");
 
-     drivetrain.Teleop(gamepad1, telemetry);
+     arm.Teleop(gamepad2, telemetry);
+
+     if (arm.getArmSlidePos() == -1){
+         intake.objpivot.GoToAngle(0);
+     }else{
+         intake.objpivot.GoToAngle(90-arm.getArmAngle());
+     }
 
      telemetry.update();
 
