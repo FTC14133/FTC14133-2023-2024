@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(group = "autoFTC14133")
@@ -23,54 +25,35 @@ public class Autonomous extends LinearOpMode {
         String side = selectedArray[2];
         String lrFMode =  selectedArray[3];
 
-        double startX = 0;
-        double startY = 0;
-
         switch (alliance){
             case "red":
-                switch (side){
-                    case "far":
-                        startX = -35;
-                        startY = -62;
-                    case "close":
-                        startX = 12;
-                        startY = -62;
-                }
-            case "blue":
-                switch (side){
-                    case "far":
-                        startX = -35;
-                        startY = 80;
-                    case "close":
-                        startX = 12;
-                        startY = 80;
-                }
+                switch (side)
         }
 
-        Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(-35, -62, Math.toRadians(90));
 
         drive.setPoseEstimate(startPose);
 
 
 
-        Trajectory RspikeL = drive.trajectoryBuilder(drive.getPoseEstimate())
+        Trajectory spikeL = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToConstantHeading(new Vector2d(-47, -40))
                 .build();
-        Trajectory RspikeC = drive.trajectoryBuilder(drive.getPoseEstimate())
+        Trajectory spikeC = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToConstantHeading(new Vector2d(-36, -36))
                 .build();
-        Trajectory RspikeR = drive.trajectoryBuilder(drive.getPoseEstimate())
+        Trajectory spikeR = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToConstantHeading(new Vector2d(-24, -36))
                 .build();
 
 
 
-        TrajectorySequence RstraightTo = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence straightTo = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(40, -36, Math.toRadians(180)))
                 .splineToConstantHeading(new Vector2d(61, -58), 0)
                 .build();
 
-        TrajectorySequence RfarLRB = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence farLRB = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .lineToConstantHeading(new Vector2d(-36, -36))
                 .lineToConstantHeading(new Vector2d(-36, -11))
                 .lineToLinearHeading(new Pose2d(35, -59, Math.toRadians(180)))
@@ -78,7 +61,7 @@ public class Autonomous extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(61, -58), 0)
                 .build();
 
-        TrajectorySequence RfarLRT = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectorySequence farLRT = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .lineToConstantHeading(new Vector2d(-36, -36))
                 .lineToConstantHeading(new Vector2d(-36, -11))
                 .lineToLinearHeading(new Pose2d(35, -11, Math.toRadians(180)))
@@ -86,102 +69,61 @@ public class Autonomous extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(61, -58), 0)
                 .build();
 
-
-
-
-
-        Trajectory BspikeL = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-47, 40))
-                .build();
-        Trajectory BspikeC = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-36, 36))
-                .build();
-        Trajectory BspikeR = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-24, 36))
-                .build();
-
-
-
-        TrajectorySequence BstraightTo = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(40, 36, Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(61, 58), 0)
-                .build();
-
-        TrajectorySequence BfarLRB = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-36, 36))
-                .lineToConstantHeading(new Vector2d(-36, 11))
-                .lineToLinearHeading(new Pose2d(35, 59, Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(40, 36), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(61, 58), 0)
-                .build();
-
-        TrajectorySequence BfarLRT = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-36, 36))
-                .lineToConstantHeading(new Vector2d(-36, 11))
-                .lineToLinearHeading(new Pose2d(35, 11, Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(40, 36), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(61, 58), 0)
-                .build();
-
-
-
         if (!isStopRequested()){
             switch (alliance){
                 case "red":
                     switch (spike){
                         case "left":
-                            drive.followTrajectory(RspikeL);
+                            drive.followTrajectory(spikeL);
                         case "right":
-                            drive.followTrajectory(RspikeR);
+                            drive.followTrajectory(spikeR);
                         case "center":
-                            drive.followTrajectory(RspikeC);
+                            drive.followTrajectory(spikeC);
                     }
                     switch (side){
                         case "close":
-                            drive.followTrajectorySequence(RstraightTo);
+                            drive.followTrajectorySequence(straightTo);
                         case "far":
                             switch (spike){
                                 case "left": case "right":
                                     switch (lrFMode){
                                         case "top":
-                                            drive.followTrajectorySequence(RfarLRT);
+                                            drive.followTrajectorySequence(farLRT);
                                         case "bottom":
-                                            drive.followTrajectorySequence(RfarLRB);
+                                            drive.followTrajectorySequence(farLRB);
                                     }
                                 case "center":
-                                    drive.followTrajectorySequence(RstraightTo);
+                                    drive.followTrajectorySequence(straightTo);
                             }
                     }
-
-
-
                 case "blue":
-                    switch (spike){
-                        case "left":
-                            drive.followTrajectory(BspikeL);
-                        case "right":
-                            drive.followTrajectory(BspikeR);
-                        case "center":
-                            drive.followTrajectory(BspikeC);
-                    }
-                    switch (side){
-                        case "close":
-                            drive.followTrajectorySequence(BstraightTo);
-                        case "far":
-                            switch (spike){
-                                case "left": case "right":
-                                    switch (lrFMode){
-                                        case "top":
-                                            drive.followTrajectorySequence(BfarLRT);
-                                        case "bottom":
-                                            drive.followTrajectorySequence(BfarLRB);
-                                    }
-                                case "center":
-                                    drive.followTrajectorySequence(BstraightTo);
-                            }
-                    }
+
             }
 
+/*            if (alliance.equals("red")){
+                if (side.equals("far")){
+                    if (spike.equals("center")){
+                        drive.followTrajectory(spikeC);
+                        drive.followTrajectorySequence(straightTo);
+                    }else{
+                        if (spike.equals("left")){
+                            drive.followTrajectory(spikeL);
+                        }else{
+                            drive.followTrajectory(spikeR);
+                        }
+
+
+                        if (lrMode.equals("top")){
+                            drive.followTrajectorySequence(farLRT);
+                        }else{
+                            drive.followTrajectorySequence(farLRB);
+                        }
+                    }
+                }
+
+            }*/
+
+            //drive.followTrajectory(finish);
         }
     }
 
