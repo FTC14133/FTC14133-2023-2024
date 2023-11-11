@@ -15,7 +15,7 @@ public class TeamElementSubsystem {
     int camW = 800;
     int camH = 448;
 
-    int zone = 1;
+    String zone = "left";
 
     public TeamElementSubsystem(HardwareMap hardwareMap){
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"));
@@ -42,7 +42,7 @@ public class TeamElementSubsystem {
         splitAveragePipeline.setAlliancePipe(alliance);
     }
 
-    public int elementDetection(Telemetry telemetry) {
+    public String elementDetection(Telemetry telemetry) {
         zone = splitAveragePipeline.get_element_zone();
         telemetry.addData("Element Zone", zone);
         return zone;

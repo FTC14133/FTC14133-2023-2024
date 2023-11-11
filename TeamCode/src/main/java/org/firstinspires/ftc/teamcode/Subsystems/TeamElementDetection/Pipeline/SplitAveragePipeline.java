@@ -23,7 +23,7 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
     //Telemetry telemetry;
 
-    static int color_zone = 1;
+    static String color_zone = "left";
 
     //public SplitAveragePipeline(/*Telemetry telemetry, */int iCAMERA_HEIGHT, int iCAMERA_WIDTH){
     //    //this.telemetry = telemetry;
@@ -64,14 +64,14 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
         if (max_distance == distance1){
             //telemetry.addData("Zone 1 Has Element", distance1);
-            color_zone = 1;
+            color_zone = "left";
 
         }else if (max_distance == distance2){
             //telemetry.addData("Zone 2 Has Element", distance2);
-            color_zone = 2;
+            color_zone = "center";
         }else{
             //telemetry.addData("Zone 2 Has Element", distance3);
-            color_zone = 3;
+            color_zone = "right";
         }
 
         /*telemetry.addData("\nZone 1 Color", avgColor1);
@@ -105,7 +105,7 @@ public class SplitAveragePipeline extends OpenCvPipeline {
         }
     }
 
-    public int get_element_zone(){
+    public String get_element_zone(){
         return color_zone;
     }
 
