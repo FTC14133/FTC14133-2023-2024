@@ -6,35 +6,16 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Lift;
-import org.firstinspires.ftc.teamcode.Subsystems.Sensors;
-import org.firstinspires.ftc.teamcode.Subsystems.Detection;
-
 @Autonomous(name="FTC_14133_2022_Auto", group="Auto")
 
 public class  FTC_14133_2022_Auto extends LinearOpMode{
-    private Drivetrain drivetrain=null; // This activates the sub systems
-    //private Intake Intake=null;
-    //private Lift Lift =null;
-    //private Sensors Sensors=null;
-    //private Detection Detection=null;
-    //private ColorSensorSubsystem Color = null;
-    int routine = 7;
-    int detected = 2;
+
 
 
     public void HardwareStart() {
         telemetry.addData("Object Creation", "Start");
         telemetry.update();
 
-        drivetrain = new Drivetrain(hardwareMap);
-        //Intake = new Intake(hardwareMap);
-        //Lift = new Lift(hardwareMap);
-        //Sensors = new Sensors(hardwareMap);
-        //Detection = new Detection(hardwareMap);
-        //Color = new ColorSensorSubsystem(hardwareMap);
 
         telemetry.addData("Object Creation", "Done");
         telemetry.update();
@@ -47,10 +28,6 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
         HardwareStart();
 
         telemetry.addData("Object", "Passed waitForStart");
-
-        drivetrain.DrivetrainAutoMove(10, 0.5, 0, 0, telemetry);
-        drivetrain.DrivetrainAutoMove(10, 0.5, 90, 0, telemetry);
-        drivetrain.DrivetrainAutoMove(10, 0.5, 45, 0, telemetry);
 
         telemetry.update();
 
