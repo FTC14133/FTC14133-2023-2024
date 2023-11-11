@@ -105,7 +105,7 @@ public class AprilTagDetection{
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
-    private org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
+         // Used to hold the data for a detected AprilTag
 
     public AprilTagDetection(HardwareMap hardwareMap) throws InterruptedException {
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "lf");
@@ -116,10 +116,10 @@ public class AprilTagDetection{
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
         initAprilTag(hardwareMap);
-        setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+        //setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
     }
 
-    public void goToTag(Telemetry telemetry, int DESIRED_TAG_ID) {
+    public void goToTag(Telemetry telemetry, int desiredTagID) {
         boolean targetFound = false;    // Set to true when an AprilTag target is detected
         double drive = 0;        // Desired forward power/speed (-1 to +1)
         double strafe = 0;        // Desired strafe power/speed (-1 to +1)
@@ -127,46 +127,48 @@ public class AprilTagDetection{
 
         ElapsedTime time = new ElapsedTime();
 
-        while (time.time() <= 3 && !targetFound) {
+        org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag = null;
 
+        while (time.seconds() <= 3) {
+            desiredTag = getDetections(desiredTagID);
+        }
+        if (desiredTag == null){
             targetFound = false;
-            desiredTag = null;
-
-            // Step through the list of detected tags and look for a matching tag
-            List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> currentDetections = aprilTag.getDetections();
-            for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : currentDetections) {
-                if ((detection.metadata != null) &&
-                        ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID))) {
-                    targetFound = true;
-                    desiredTag = detection;
-                    break;  // don't look any further.
-                } else {
-                    telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
-                }
-            }
+        }else{
+            targetFound = true;
         }
 
         if (targetFound) {
-            telemetry.addData("Target", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-            telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
-            telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
-            telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
+
+            while (true) {
+
+                desiredTag = getDetections(desiredTagID);
+
+                telemetry.addData("Target", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
+                telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
+                telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
+                telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
 
 
-            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-            double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
-            double headingError = desiredTag.ftcPose.bearing;
-            double yawError = desiredTag.ftcPose.yaw;
+                // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+                double rangeError = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
+                double headingError = desiredTag.ftcPose.bearing;
+                double yawError = desiredTag.ftcPose.yaw;
 
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-            drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
-            turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-            strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+                // Use the speed and turn "gains" to calculate how we want the robot to move.
+                drive = Range.clip(rangeError * SPEED_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
+                turn = Range.clip(headingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
+                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
-            telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
+                telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
 
-            // Apply desired axes motions to the drivetrain.
-            moveRobot(drive, strafe, turn);
+                telemetry.update();
+
+                
+
+                // Apply desired axes motions to the drivetrain.
+                moveRobot(drive, strafe, turn);
+            }
         }
     }
 
@@ -179,7 +181,7 @@ public class AprilTagDetection{
      * <p>
      * Positive Yaw is counter-clockwise
      */
-    public void moveRobot(double x, double y, double yaw) {
+    private void moveRobot(double x, double y, double yaw) {
         // Calculate wheel powers.
         double leftFrontPower    =  x -y -yaw;
         double rightFrontPower   =  x +y +yaw;
@@ -204,9 +206,20 @@ public class AprilTagDetection{
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
 
-        while (leftFrontDrive.isBusy() && rightFrontDrive.isBusy()){
-            // Wait for drive to arrive
+    }
+
+    private org.firstinspires.ftc.vision.apriltag.AprilTagDetection getDetections(int desiredTagID){
+        org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag = null;
+
+        List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : currentDetections) {
+            if ((detection.metadata != null) &&
+                    ((desiredTagID < 0) || (detection.id == desiredTagID))) {
+                desiredTag = detection;
+                break;
+            }
         }
+        return desiredTag;
     }
 
     /**

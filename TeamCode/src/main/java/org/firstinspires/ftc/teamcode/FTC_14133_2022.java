@@ -4,8 +4,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.Subsystems.Detection;
 //import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 //import org.firstinspires.ftc.teamcode.Subsystems.Lift;
 //import org.firstinspires.ftc.teamcode.Subsystems.Sensors;
@@ -23,11 +21,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Detection;
 
 public class  FTC_14133_2022 extends OpMode {
 
-    private Detection Detection=null;
-
  public void init() {
-
-     Detection = new Detection(hardwareMap);
 
  }
 
@@ -40,13 +34,8 @@ public class  FTC_14133_2022 extends OpMode {
  public void loop() {
      telemetry.addData("Status", "Looping");
 
-     Detection.Teleop(telemetry, gamepad1);
-
      telemetry.update();
 
  }
 
- public void stop(){
-     Detection.StopPortal();
- }
 }
