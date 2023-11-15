@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsytem.Arm;
 import org.firstinspires.ftc.teamcode.Subsytem.Intake;
 
-@TeleOp(name="FTC_14133_2022", group="Iterative Opmode") // Labels program in Driver station Selection
+@TeleOp(name="getpostele", group="Iterative Opmode") // Labels program in Driver station Selection
 
 public class getpostele extends OpMode {
 
