@@ -13,6 +13,8 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
     private TeamElementSubsystem teamElementDetection=null;
 
+    boolean togglePreview = true;
+
     public void HardwareStart() {
         telemetry.addData("Object Creation", "Start");
         telemetry.update();
@@ -33,7 +35,13 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
         while (!opModeIsActive() && !isStopRequested()){
             element_zone = teamElementDetection.elementDetection(telemetry);
-            teamElementDetection.toggleAverageZone(gamepad2);
+            if (togglePreview && gamepad2.a){
+                togglePreview = false;
+                teamElementDetection.toggleAverageZone(gamepad2);
+            }else if (!gamepad2.a){
+                togglePreview = true;
+            }
+
 
             if (gamepad1.x){
                 curAlliance = "blue";

@@ -50,9 +50,7 @@ public class TeamElementSubsystem {
     }
 
     public void toggleAverageZone(Gamepad gamepad2){
-        if (gamepad2.a) {
-            splitAveragePipeline.toggleAverageZonePipe();
-        }
+        splitAveragePipeline.toggleAverageZonePipe();
     }
 }
 
