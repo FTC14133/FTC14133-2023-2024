@@ -49,7 +49,7 @@ public class TeamElementSubsystem {
         return zone;
     }
 
-    public void toggleAverageZone(Gamepad gamepad2){
+    public void toggleAverageZone(){
         splitAveragePipeline.toggleAverageZonePipe();
     }
 }
