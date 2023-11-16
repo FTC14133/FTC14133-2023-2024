@@ -11,16 +11,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Intake {
     // Instantiate the motor variables
-    static DcMotorEx intakeSucker;
-    static CRServo intakePivot;
+    static DcMotorEx intake;
+    static CRServo outtake;
+
+    static CRServo intakePivotL;
+    static CRServo intakePivotR;
+
     AnalogInput pivotIntakePNP;
 
     private PIDController controller; // todo: make ff
     public static double p = 0, i = 0, d = 0; // todo: tune intake pivot pid
 
     //boolean Possession = true; //Variable telling whether we have possession of a game piece or not
-
-    int teleopState = 0;
 
     final double suckerSpeed = 1; // todo: figure out good speed
     final double degpervoltage = 270/3.3;
@@ -30,8 +32,12 @@ public class Intake {
     public Pivot objpivot;
 
     public Intake(HardwareMap hardwareMap){                 // Motor Mapping
-        intakeSucker = hardwareMap.get(DcMotorEx.class, "intakeSuck");
-        intakePivot = hardwareMap.get(CRServo.class, "intakePiv");
+        intake = hardwareMap.get(DcMotorEx.class, "intakeM");
+        outtake = hardwareMap.get(CRServo.class, "outtakeS");
+
+        intakePivotL = hardwareMap.get(CRServo.class, "intakePLS");
+        intakePivotR = hardwareMap.get(CRServo.class, "intakePRS");
+
         pivotIntakePNP = hardwareMap.get(AnalogInput.class, "intakePNP");
 
         controller.setPID(p, i, d);
@@ -43,22 +49,37 @@ public class Intake {
     }
 
     public class Catcher {
-        private void runIntake(double intakeState){ // 1 is intake, 0 is off, -1 is outtake
-            intakeSucker.setPower(suckerSpeed *intakeState);
+        public void runIntake(double intakeState){ // 1 is intake, 0 is off, -1 is outtake
+            intake.setPower(suckerSpeed *intakeState);
+        }
+
+        public void runOutake(double outtakeState){
+            outtake.setPower(suckerSpeed *outtakeState);
         }
 
         public void Teleop(Gamepad gamepad2, Telemetry telemetry) { //Code to be run in Op Mode void Loop at top level
 
+            int intakeState = 0;
+            int outtakeState = 0;
+
             if (gamepad2.a){ //Intake
-                teleopState = 1;
+                intakeState = 1;
             }else if (gamepad2.b){ //Outtake
-                teleopState = -1;
+                intakeState = -1;
             }else{
-                teleopState = 0;
+                intakeState = 0;
             }
 
-            runIntake(teleopState);
-            telemetry.addData("teleopState", teleopState);
+            if (gamepad2.a){ //Intake
+                outtakeState = 1;
+            }else if (gamepad2.b){ //Outtake
+                outtakeState = -1;
+            }else{
+                outtakeState = 0;
+            }
+
+            runIntake(intakeState);
+            runOutake(outtakeState);
             //telemetry.addData("Possession", Possession);
         }
 
@@ -82,7 +103,7 @@ public class Intake {
             double currentPos = getIntakeAngle();
             double pid = controller.calculate(currentPos, intakeTargetPos);
 
-            intakePivot.setPower(pid);
+            //intakePivot.setPower(pid);
         }
     }
 }

@@ -31,12 +31,16 @@ public class  FTC_14133_2022 extends OpMode {
  public void loop() {
      telemetry.addData("Status", "Looping");
 
-     arm.Teleop(gamepad2, telemetry);
+     //arm.Teleop(gamepad2, telemetry);
 
      if (arm.getArmSlidePos() == -1){
          intake.objpivot.GoToAngle(0);
      }else{
-         intake.objpivot.GoToAngle(90-arm.getArmAngle());
+         double targetIntake = 90-arm.getArmAngle();
+         if (targetIntake < 0){
+             targetIntake = 0;
+         }
+         intake.objpivot.GoToAngle(targetIntake);
      }
 
      telemetry.update();

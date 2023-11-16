@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Arm {
 
     DcMotorEx slideM;
-    DcMotorEx armLM, armRM;
+    DcMotorEx armL, armR;
 
     AnalogInput armPNP;
 
@@ -29,8 +29,8 @@ public class Arm {
     boolean toggleArm = true;
     int armSlidePos = -1;
 
-    int armMax = 3;
-    int armMin = -1;
+    int armMax = 5;
+    int armMin = 1;
 
     double armTargetPos = 0;
     double slideTargetPos = 0;
@@ -41,14 +41,15 @@ public class Arm {
         slideM = hardwareMap.get(DcMotorEx.class, "slideM");
         slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        armLM = hardwareMap.get(DcMotorEx.class, "armLM");
-        armRM = hardwareMap.get(DcMotorEx.class, "armRM");
+        armL = hardwareMap.get(DcMotorEx.class, "armLM");
+        armR = hardwareMap.get(DcMotorEx.class, "armRM");
 
-        armLM.setDirection(DcMotorSimple.Direction.REVERSE);
+        armL.setDirection(DcMotorSimple.Direction.REVERSE);
+        armR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         armPNP = hardwareMap.get(AnalogInput.class, "armPNP");
 
-        armLimit = hardwareMap.get(DigitalChannel.class, "armLimit");
+        armLimit = hardwareMap.get(DigitalChannel.class, "armLS");
         armLimit.setMode(DigitalChannel.Mode.INPUT);
 
         armController.setPID(armP, armI, armD);
@@ -83,23 +84,23 @@ public class Arm {
         armSlidePos = position; // to update in auto, redundant in teleop
 
         switch (armSlidePos){
-            case -1:
+            case 1:
                 armTargetPos = 0; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 0:
+            case 2:
                 armTargetPos = 1; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 1:
+            case 3:
                 armTargetPos = 2; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 2:
+            case 4:
                 armTargetPos = 3; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 3:
+            case 5:
                 armTargetPos = 4; // todo: get good angle
                 slideTargetPos = 0;
                 break;
@@ -114,8 +115,8 @@ public class Arm {
             slidePower = 0;
         }
 
-        armLM.setPower(armPower);
-        armRM.setPower(armPower);
+        armL.setPower(armPower);
+        armR.setPower(armPower);
 
         slideM.setPower(slidePower);
 
