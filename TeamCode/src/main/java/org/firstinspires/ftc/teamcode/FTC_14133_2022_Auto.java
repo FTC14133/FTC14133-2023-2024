@@ -33,6 +33,7 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
         while (!opModeIsActive() && !isStopRequested()){
             element_zone = teamElementDetection.elementDetection(telemetry);
+            teamElementDetection.toggleAverageZone(gamepad2);
 
             if (gamepad1.x){
                 curAlliance = "blue";

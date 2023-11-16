@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems.TeamElementDetection;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -46,6 +47,12 @@ public class TeamElementSubsystem {
         zone = splitAveragePipeline.get_element_zone();
         telemetry.addData("Element Zone", zone);
         return zone;
+    }
+
+    public void toggleAverageZone(Gamepad gamepad2){
+        if (gamepad2.a) {
+            splitAveragePipeline.toggleAverageZonePipe();
+        }
     }
 }
 

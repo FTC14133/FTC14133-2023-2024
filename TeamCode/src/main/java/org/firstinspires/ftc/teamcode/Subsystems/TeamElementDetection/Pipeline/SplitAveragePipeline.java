@@ -25,6 +25,8 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
     static int color_zone = 1;
 
+    int toggleShow = 1;
+
     //public SplitAveragePipeline(/*Telemetry telemetry, */int iCAMERA_HEIGHT, int iCAMERA_WIDTH){
     //    //this.telemetry = telemetry;
     //    this.CAMERA_HEIGHT = iCAMERA_HEIGHT;
@@ -34,14 +36,13 @@ public class SplitAveragePipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
 
+        //Creating duplicate of original frame with no edits
+        Mat original = input.clone();
+
         //input = input.submat(new Rect(0));
 
         //Defining Zones
         //Rect(top left x, top left y, bottom right x, bottom right y)
-        //Mat zone1 = input.submat(new Rect(0, 0, line1x, CAMERA_HEIGHT));
-        //Mat zone2 = input.submat(new Rect(line1x, 0, line2x - line1x, CAMERA_HEIGHT));
-        //Mat zone3 = input.submat(new Rect(line2x, 0, CAMERA_WIDTH - line2x, CAMERA_HEIGHT));
-
         Mat zone1 = input.submat(new Rect(0, 180, 115, 115));
         Mat zone2 = input.submat(new Rect(316, 180, 115, 115));
         Mat zone3 = input.submat(new Rect(660, 180, 115, 115));
@@ -74,15 +75,12 @@ public class SplitAveragePipeline extends OpenCvPipeline {
             color_zone = 3;
         }
 
-        /*telemetry.addData("\nZone 1 Color", avgColor1);
-        telemetry.addData("Zone 2 Color", avgColor2);
-        telemetry.addData("Zone 3 Color", avgColor3);
-
-        telemetry.update();
-
-         */
-
-        return input;
+        // Allowing for the showing of the averages on the stream
+        if (toggleShow == 1){
+            return input;
+        }else{
+            return original;
+        }
     }
 
     public double color_distance(Scalar color1, List color2){
@@ -107,6 +105,10 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
     public int get_element_zone(){
         return color_zone;
+    }
+
+    public void toggleAverageZonePipe(){
+        toggleShow = toggleShow * -1;
     }
 
 }
