@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -43,7 +44,7 @@ public class movemotor extends OpMode {
         intakeSucker = hardwareMap.get(DcMotorEx.class, "intakeM");
 
         slide = hardwareMap.get(DcMotorEx.class, "slideM");
-
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         intakePivotL.setDirection(DcMotorSimple.Direction.REVERSE);
         intakePivotR.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -58,6 +59,7 @@ public class movemotor extends OpMode {
         telemetry.addData("Status", "Looping");
 
         telemetry.addData("getArmSlidePos", (pivotIntakePNP.getVoltage() * degpervoltage));
+        telemetry.addData("slide", slide.getCurrentPosition());
         telemetry.update();
 
         intakePivotL.setPower(gamepad2.left_stick_y);

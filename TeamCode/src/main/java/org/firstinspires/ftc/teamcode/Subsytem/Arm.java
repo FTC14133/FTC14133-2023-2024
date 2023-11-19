@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -18,7 +18,7 @@ public class Arm {
 
     AnalogInput armPNP;
 
-    DigitalChannel armLimit;
+    TouchSensor slideLimit;
 
     private PIDController armController; // todo: make ff
     public static double armP = 0, armI = 0, armD = 0; // todo: tune pid
@@ -39,7 +39,7 @@ public class Arm {
 
     public Arm(HardwareMap hardwareMap){
         slideM = hardwareMap.get(DcMotorEx.class, "slideM");
-        slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         armL = hardwareMap.get(DcMotorEx.class, "armLM");
         armR = hardwareMap.get(DcMotorEx.class, "armRM");
@@ -49,11 +49,10 @@ public class Arm {
 
         armPNP = hardwareMap.get(AnalogInput.class, "armPNP");
 
-        armLimit = hardwareMap.get(DigitalChannel.class, "armLS");
-        armLimit.setMode(DigitalChannel.Mode.INPUT);
+        slideLimit = hardwareMap.get(TouchSensor.class, "slideLS");
 
-        armController.setPID(armP, armI, armD);
-        slideController.setPID(slideP, slideI, slideD);
+        armController = new PIDController(armP, armI, armD);
+        slideController = new PIDController(slideP, slideI, slideD);
     }
 
     public void Teleop(Gamepad gamepad2, Telemetry telemetry){
@@ -111,7 +110,7 @@ public class Arm {
         double armPower = armController.calculate(getArmAngle(), armTargetPos);
         double slidePower = slideController.calculate(getSlideLenght(), slideTargetPos);
 
-        if (armLimit.getState()){
+        if (slideLimit.isPressed()){
             slidePower = 0;
         }
 

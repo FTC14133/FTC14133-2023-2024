@@ -19,7 +19,7 @@ public class Intake {
 
     AnalogInput pivotIntakePNP;
 
-    private PIDController controller; // todo: make ff
+    private PIDController intakePController; // todo: make ff
     public static double p = 0, i = 0, d = 0; // todo: tune intake pivot pid
 
     //boolean Possession = true; //Variable telling whether we have possession of a game piece or not
@@ -40,7 +40,7 @@ public class Intake {
 
         pivotIntakePNP = hardwareMap.get(AnalogInput.class, "intakePNP");
 
-        controller.setPID(p, i, d);
+        intakePController = new PIDController(p, i, d);
 
         objcatcher = new Catcher();
         objpivot = new Pivot();
@@ -62,17 +62,17 @@ public class Intake {
             int intakeState = 0;
             int outtakeState = 0;
 
-            if (gamepad2.a){ //Intake
+            if (gamepad2.y){ //Intake
                 intakeState = 1;
-            }else if (gamepad2.b){ //Outtake
+            }else if (gamepad2.b){ //Reverse Intake
                 intakeState = -1;
             }else{
                 intakeState = 0;
             }
 
-            if (gamepad2.a){ //Intake
+            if (gamepad2.x){ //Outtake
                 outtakeState = 1;
-            }else if (gamepad2.b){ //Outtake
+            }else if (gamepad2.a){ //Reverse Outtake
                 outtakeState = -1;
             }else{
                 outtakeState = 0;
@@ -101,9 +101,13 @@ public class Intake {
             intakeTargetPos = angle;
 
             double currentPos = getIntakeAngle();
-            double pid = controller.calculate(currentPos, intakeTargetPos);
+            double pid = intakePController.calculate(currentPos, intakeTargetPos);
 
             //intakePivot.setPower(pid);
+        }
+
+        public double returnPos(){
+            return intake.getCurrentPosition();
         }
     }
 }
