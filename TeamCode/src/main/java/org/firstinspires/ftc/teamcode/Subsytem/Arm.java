@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsytem;
 
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -20,22 +21,26 @@ public class Arm {
 
     TouchSensor slideLimit;
 
-    private PIDController armController; // todo: make ff
-    public static double armP = 0, armI = 0, armD = 0; // todo: tune pid
-
-    private PIDController slideController; // todo: make ff
-    public static double slideP = 0, slideI = 0, slideD = 0; // todo: tune pid
+    private PIDFController armController;
+    public static double armP = 0.1, armI = 0, armD = 0.00001, armFF = -0.001;
 
     boolean toggleArm = true;
-    int armSlidePos = -1;
+    boolean toggleClimb = true;
 
-    int armMax = 5;
-    int armMin = 1;
+    int climbOnOff = 1;
+
+    int armSlidePos = -1;
+    String clicklast = "b";
+
+    int armMax = 4;
+    int armMin = 0;
 
     double armTargetPos = 0;
     double slideTargetPos = 0;
 
     final double degpervoltage = 270/3.3;
+
+    double slidePower = 1;
 
     public Arm(HardwareMap hardwareMap){
         slideM = hardwareMap.get(DcMotorEx.class, "slideM");
@@ -52,7 +57,6 @@ public class Arm {
         slideLimit = hardwareMap.get(TouchSensor.class, "slideLS");
 
         armController = new PIDController(armP, armI, armD);
-        slideController = new PIDController(slideP, slideI, slideD);
     }
 
     public void Teleop(Gamepad gamepad2, Telemetry telemetry){
@@ -75,6 +79,39 @@ public class Arm {
             toggleArm = true; // Button has been released, so this allows a re-press to activate the code above.
         }
 
+
+        if (gamepad2.b){
+            armSlidePos = 0;
+            clicklast = "b";
+        }else if (gamepad2.a){
+            armSlidePos = 1;
+            clicklast = "a";
+        }else if (gamepad2.x){
+            armSlidePos = 2;
+            clicklast = "x";
+        }else if (gamepad2.y){
+            armSlidePos = 3;
+            clicklast = "y";
+        }
+
+
+        if (gamepad2.back && toggleClimb){
+            toggleClimb = false;
+            climbOnOff *= -1;
+            clicklast = "back";
+        }else if (!gamepad2.back){
+            toggleClimb = false;
+        }
+
+        if (clicklast.equals("back")) {
+            if (climbOnOff == 1) {
+                armSlidePos = 4;
+            } else if (climbOnOff == -1) {
+                armSlidePos = 5;
+            }
+        }
+
+
         GoToPosition(armSlidePos);
     }
 
@@ -83,48 +120,60 @@ public class Arm {
         armSlidePos = position; // to update in auto, redundant in teleop
 
         switch (armSlidePos){
-            case 1:
+            case 0: // Intake
                 armTargetPos = 0; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 2:
+            case 1: // Low Place
                 armTargetPos = 1; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 3:
+            case 2: // Medium Place
                 armTargetPos = 2; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 4:
+            case 3: // High Place
                 armTargetPos = 3; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 5:
+            case 4: // Climb High
                 armTargetPos = 4; // todo: get good angle
+                slideTargetPos = 0;
+                break;
+            case 5: // Climb Low
+                armTargetPos = 5; // todo: get good angle
                 slideTargetPos = 0;
                 break;
             default:
                 throw new IllegalStateException("Unexpected position value: " + position); // todo: remove in comp
         }
 
-        double armPower = armController.calculate(getArmAngle(), armTargetPos);
-        double slidePower = slideController.calculate(getSlideLenght(), slideTargetPos);
 
+        slidePower = 1;
         if (slideLimit.isPressed()){
             slidePower = 0;
+            slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slideM.setTargetPosition(100); //todo: get good pos for not pressing limit switch
+        }else{
+            slideM.setTargetPosition((int) slideTargetPos);
         }
+        slideM.setPower(slidePower);
 
+        double armPower = armController.calculate(getArmAngle(), armTargetPos);
         armL.setPower(armPower);
         armR.setPower(armPower);
 
-        slideM.setPower(slidePower);
-
     }
 
-    public void GoToPositionAuto(int position){
-        while (!(getArmAngle() >= armTargetPos-5 && getArmAngle() <= armTargetPos+5) && !(getSlideLenght() >= slideTargetPos-5 && getSlideLenght() <= slideTargetPos+5)){
-            GoToPosition(position);
+    public void homeSlides(){
+        slideM.setPower(-1);
+        while (!slideLimit.isPressed()){
+
         }
+        slideM.setPower(0);
+        slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public double getArmAngle(){

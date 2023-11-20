@@ -34,6 +34,10 @@ public class  FTC_14133_2022 extends OpMode {
      intake.objcatcher.Teleop(gamepad2, telemetry);
      telemetry.addData("intake", intake.objpivot.returnPos());
 
+     if (gamepad2.left_stick_button){
+         arm.homeSlides();
+     }
+
      //arm.Teleop(gamepad2, telemetry);
 
      /*if (arm.getArmSlidePos() == -1){
