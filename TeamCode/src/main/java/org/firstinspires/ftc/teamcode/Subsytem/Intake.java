@@ -106,9 +106,6 @@ public class Intake {
             //intakePivot.setPower(pid);
         }
 
-        public double returnPos(){
-            return intake.getCurrentPosition();
-        }
     }
 }
 

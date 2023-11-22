@@ -27,6 +27,7 @@ public class movemotor extends OpMode {
     static DcMotorEx armPivotR;
 
     AnalogInput pivotIntakePNP;
+    AnalogInput pivotArmPNP;
 
     final double degpervoltage = 270/3.3;
 
@@ -39,12 +40,15 @@ public class movemotor extends OpMode {
         armPivotR = hardwareMap.get(DcMotorEx.class, "armRM");
 
         pivotIntakePNP = hardwareMap.get(AnalogInput.class, "intakePNP");
+        pivotArmPNP = hardwareMap.get(AnalogInput.class, "armPNP");
 
         intakeOuter = hardwareMap.get(CRServo.class, "outtakeS");
         intakeSucker = hardwareMap.get(DcMotorEx.class, "intakeM");
 
         slide = hardwareMap.get(DcMotorEx.class, "slideM");
+        slide.setDirection(DcMotorSimple.Direction.REVERSE);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         intakePivotL.setDirection(DcMotorSimple.Direction.REVERSE);
         intakePivotR.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -58,21 +62,20 @@ public class movemotor extends OpMode {
     public void loop() {
         telemetry.addData("Status", "Looping");
 
-        telemetry.addData("getArmSlidePos", (pivotIntakePNP.getVoltage() * degpervoltage));
+
+        telemetry.addData("intake deg", (pivotIntakePNP.getVoltage() * degpervoltage));
+        telemetry.addData("intake voltage", (pivotIntakePNP.getVoltage()));
+        telemetry.addData("arm", (pivotArmPNP.getVoltage() * degpervoltage));
         telemetry.addData("slide", slide.getCurrentPosition());
         telemetry.update();
 
-        intakePivotL.setPower(gamepad2.left_stick_y);
-        intakePivotR.setPower(gamepad2.left_stick_y);
+        intakePivotL.setPower(-gamepad2.left_stick_y);
+        intakePivotR.setPower(-gamepad2.left_stick_y);
 
-        armPivotL.setPower(gamepad1.left_stick_y);
-        armPivotR.setPower(gamepad1.left_stick_y);
+        armPivotL.setPower(-gamepad1.left_stick_y);
+        armPivotR.setPower(-gamepad1.left_stick_y);
 
-        telemetry.addData("gamepad1.left_stick_y", gamepad1.left_stick_y);
-        telemetry.addData("gamepad2.left_stick_y", gamepad2.left_stick_y);
-        telemetry.addData("gamepad2.right_stick_y", gamepad2.right_stick_y);
-
-        slide.setPower(gamepad2.right_stick_y);
+        slide.setPower(-gamepad2.right_stick_y);
 
         if (gamepad2.x){
             intakeOuter.setPower(1);

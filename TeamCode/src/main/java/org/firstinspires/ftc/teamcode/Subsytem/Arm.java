@@ -44,12 +44,13 @@ public class Arm {
 
     public Arm(HardwareMap hardwareMap){
         slideM = hardwareMap.get(DcMotorEx.class, "slideM");
+        slideM.setDirection(DcMotorSimple.Direction.REVERSE);
         slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         armL = hardwareMap.get(DcMotorEx.class, "armLM");
         armR = hardwareMap.get(DcMotorEx.class, "armRM");
 
-        armL.setDirection(DcMotorSimple.Direction.REVERSE);
+        armL.setDirection(DcMotorSimple.Direction.FORWARD);
         armR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         armPNP = hardwareMap.get(AnalogInput.class, "armPNP");
@@ -89,9 +90,6 @@ public class Arm {
         }else if (gamepad2.x){
             armSlidePos = 2;
             clicklast = "x";
-        }else if (gamepad2.y){
-            armSlidePos = 3;
-            clicklast = "y";
         }
 
 
@@ -105,9 +103,9 @@ public class Arm {
 
         if (clicklast.equals("back")) {
             if (climbOnOff == 1) {
-                armSlidePos = 4;
+                armSlidePos = 3;
             } else if (climbOnOff == -1) {
-                armSlidePos = 5;
+                armSlidePos = 4;
             }
         }
 
@@ -120,33 +118,31 @@ public class Arm {
         armSlidePos = position; // to update in auto, redundant in teleop
 
         switch (armSlidePos){
-            case 0: // Intake
-                armTargetPos = 0; // todo: get good angle
-                slideTargetPos = 0;
+            case 0: // Intake 96
+                armTargetPos = 106;
+                slideTargetPos = 6984;
                 break;
             case 1: // Low Place
-                armTargetPos = 1; // todo: get good angle
-                slideTargetPos = 0;
+                armTargetPos = 69;
+                slideTargetPos = 33321;
                 break;
             case 2: // Medium Place
-                armTargetPos = 2; // todo: get good angle
+                armTargetPos = 63;
+                slideTargetPos = 50592;
+                break;
+            case 3: // Climb High
+                armTargetPos = 63; // todo: get good angle
                 slideTargetPos = 0;
                 break;
-            case 3: // High Place
-                armTargetPos = 3; // todo: get good angle
-                slideTargetPos = 0;
-                break;
-            case 4: // Climb High
-                armTargetPos = 4; // todo: get good angle
-                slideTargetPos = 0;
-                break;
-            case 5: // Climb Low
-                armTargetPos = 5; // todo: get good angle
-                slideTargetPos = 0;
+            case 4: // Climb Low
+                armTargetPos = 63; // todo: get good angle
+                slideTargetPos = 1;
                 break;
             default:
                 throw new IllegalStateException("Unexpected position value: " + position); // todo: remove in comp
         }
+
+        slideTargetPos = 0; //todo Delete this after tests
 
 
         slidePower = 1;
@@ -154,7 +150,7 @@ public class Arm {
             slidePower = 0;
             slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slideM.setTargetPosition(100); //todo: get good pos for not pressing limit switch
+            slideM.setTargetPosition(1000); //todo: get good pos for not pressing limit switch
         }else{
             slideM.setTargetPosition((int) slideTargetPos);
         }
