@@ -13,13 +13,7 @@ import java.util.List;
 
 public class SplitAveragePipeline extends OpenCvPipeline {
 
-    int CAMERA_WIDTH = 800/*800*/;
-    int CAMERA_HEIGHT = 448/*448*/;
-
     List<Integer> ELEMENT_COLOR = Arrays.asList(255, 0, 0); //(red, green, blue)
-
-    int line1x = CAMERA_WIDTH / 3;
-    int line2x = (CAMERA_WIDTH / 3) * 2;
 
     //Telemetry telemetry;
 
@@ -33,24 +27,38 @@ public class SplitAveragePipeline extends OpenCvPipeline {
     //    this.CAMERA_WIDTH = iCAMERA_WIDTH;
     //}
 
+    Mat original;
+
+    Mat zone1;
+    Mat zone2;
+    Mat zone3;
+
+    Scalar avgColor1;
+    Scalar avgColor2;
+    Scalar avgColor3;
+
+    double distance1 = 1;
+    double distance2 = 1;
+    double distance3 = 0;
+
     @Override
     public Mat processFrame(Mat input) {
 
         //Creating duplicate of original frame with no edits
-        Mat original = input.clone();
+        original = input.clone();
 
         //input = input.submat(new Rect(0));
 
         //Defining Zones
         //Rect(top left x, top left y, bottom right x, bottom right y)
-        Mat zone1 = input.submat(new Rect(0, 180, 115, 115));
-        Mat zone2 = input.submat(new Rect(316, 180, 115, 115));
-        Mat zone3 = input.submat(new Rect(660, 180, 115, 115));
+        zone1 = input.submat(new Rect(0, 180, 115, 115));
+        zone2 = input.submat(new Rect(316, 180, 115, 115));
+        zone3 = input.submat(new Rect(660, 180, 115, 115));
 
         //Averaging the colors in the zones
-        Scalar avgColor1 = Core.mean(zone1);
-        Scalar avgColor2 = Core.mean(zone2);
-        Scalar avgColor3 = Core.mean(zone3);
+        avgColor1 = Core.mean(zone1);
+        avgColor2 = Core.mean(zone2);
+        avgColor3 = Core.mean(zone3);
 
         //Putting averaged colors on zones (we can see on camera now)
         zone1.setTo(avgColor1);

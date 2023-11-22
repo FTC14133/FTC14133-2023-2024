@@ -37,7 +37,7 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
             element_zone = teamElementDetection.elementDetection(telemetry);
             if (togglePreview && gamepad2.a){
                 togglePreview = false;
-                teamElementDetection.toggleAverageZone(gamepad2);
+                teamElementDetection.toggleAverageZone();
             }else if (!gamepad2.a){
                 togglePreview = true;
             }
