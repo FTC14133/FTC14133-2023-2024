@@ -29,7 +29,7 @@ public class Arm {
 
     int climbOnOff = 1;
 
-    int armSlidePos = -1;
+    int armSlidePos = 0;
     String clicklast = "b";
 
     int armMax = 4;
@@ -38,6 +38,8 @@ public class Arm {
     double armTargetPos = 0;
     double slideTargetPos = 0;
 
+    double slideStartPos = OpmodeStorage.slidePos;
+
     final double degpervoltage = 270/3.3;
 
     double slidePower = 1;
@@ -45,7 +47,9 @@ public class Arm {
     public Arm(HardwareMap hardwareMap){
         slideM = hardwareMap.get(DcMotorEx.class, "slideM");
         slideM.setDirection(DcMotorSimple.Direction.REVERSE);
+        slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         armL = hardwareMap.get(DcMotorEx.class, "armLM");
         armR = hardwareMap.get(DcMotorEx.class, "armRM");
@@ -57,7 +61,7 @@ public class Arm {
 
         slideLimit = hardwareMap.get(TouchSensor.class, "slideLS");
 
-        armController = new PIDController(armP, armI, armD);
+        armController = new PIDFController(armP, armI, armD, armFF);
     }
 
     public void Teleop(Gamepad gamepad2, Telemetry telemetry){
@@ -118,9 +122,13 @@ public class Arm {
         armSlidePos = position; // to update in auto, redundant in teleop
 
         switch (armSlidePos){
+            case -1:
+                armTargetPos = 111;
+                slideTargetPos = 0;
+                break;
             case 0: // Intake 96
-                armTargetPos = 106;
-                slideTargetPos = 6984;
+                armTargetPos = 99;
+                slideTargetPos = 33321;
                 break;
             case 1: // Low Place
                 armTargetPos = 69;
@@ -142,19 +150,18 @@ public class Arm {
                 throw new IllegalStateException("Unexpected position value: " + position); // todo: remove in comp
         }
 
-        slideTargetPos = 0; //todo Delete this after tests
-
+        slideTargetPos -= slideStartPos;
 
         slidePower = 1;
-        if (slideLimit.isPressed()){
-            slidePower = 0;
+        if (slideLimit.isPressed()){;
             slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slideM.setTargetPosition(1000); //todo: get good pos for not pressing limit switch
+            slideM.setTargetPosition(1000);
         }else{
             slideM.setTargetPosition((int) slideTargetPos);
         }
+
         slideM.setPower(slidePower);
+        slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         double armPower = armController.calculate(getArmAngle(), armTargetPos);
         armL.setPower(armPower);
@@ -163,13 +170,14 @@ public class Arm {
     }
 
     public void homeSlides(){
+        slideM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slideM.setPower(-1);
         while (!slideLimit.isPressed()){
 
         }
         slideM.setPower(0);
         slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public double getArmAngle(){

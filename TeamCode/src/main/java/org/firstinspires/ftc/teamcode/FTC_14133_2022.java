@@ -17,7 +17,6 @@ public class  FTC_14133_2022 extends OpMode {
  public void init() {
 
      arm = new Arm(hardwareMap);
-
      intake = new Intake(hardwareMap);
 
  }
@@ -25,6 +24,8 @@ public class  FTC_14133_2022 extends OpMode {
  public void start() {
      telemetry.addData("Status", "Start");
      telemetry.update();
+
+     //arm.homeSlides();
  }
 
 
@@ -40,13 +41,18 @@ public class  FTC_14133_2022 extends OpMode {
 
      arm.Teleop(gamepad2, telemetry);
 
+     telemetry.addData("slidepos", arm.getSlideLenght());
+
      if (arm.getArmSlidePos() == 0){
-         intake.objpivot.GoToAngle(96);
+         intake.objpivot.GoToAngle(145);
      }else{
-         double targetIntake = 90-arm.getArmAngle();
-         if (targetIntake < 0){
-             targetIntake = 0;
+         double targetIntake = 100+arm.getArmAngle();
+         if (targetIntake < 86){
+             targetIntake = 86;
+         }else if (targetIntake > 270){
+             targetIntake = 270;
          }
+         telemetry.addData("targetIntake", targetIntake);
          intake.objpivot.GoToAngle(targetIntake);
      }
 

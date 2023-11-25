@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -20,7 +21,7 @@ public class Intake {
     AnalogInput pivotIntakePNP;
 
     private PIDController intakePController; // todo: make ff
-    public static double p = 0, i = 0, d = 0; // todo: tune intake pivot pid
+    public static double p = 0.1, i = 0, d = 0; // todo: tune intake pivot pid
 
     //boolean Possession = true; //Variable telling whether we have possession of a game piece or not
 
@@ -37,6 +38,9 @@ public class Intake {
 
         intakePivotL = hardwareMap.get(CRServo.class, "intakePLS");
         intakePivotR = hardwareMap.get(CRServo.class, "intakePRS");
+
+        intakePivotL.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakePivotR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         pivotIntakePNP = hardwareMap.get(AnalogInput.class, "intakePNP");
 
@@ -94,7 +98,7 @@ public class Intake {
         public double getIntakeAngle(){
             double PNPVoltage = pivotIntakePNP.getVoltage();
 
-            return degpervoltage*PNPVoltage;
+            return (degpervoltage*PNPVoltage);
         }
 
         public void GoToAngle(double angle){
@@ -103,7 +107,8 @@ public class Intake {
             double currentPos = getIntakeAngle();
             double pid = intakePController.calculate(currentPos, intakeTargetPos);
 
-            //intakePivot.setPower(pid);
+            intakePivotL.setPower(pid);
+            intakePivotR.setPower(pid);
         }
 
     }
