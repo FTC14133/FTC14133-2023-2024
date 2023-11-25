@@ -127,41 +127,44 @@ public class Arm {
                 slideTargetPos = 0;
                 break;
             case 0: // Intake 96
-                armTargetPos = 99;
-                slideTargetPos = 33321;
+                armTargetPos = 102;
+                slideTargetPos = 38377;
                 break;
             case 1: // Low Place
-                armTargetPos = 69;
-                slideTargetPos = 33321;
+                armTargetPos = 68;
+                slideTargetPos = 38377;
                 break;
             case 2: // Medium Place
-                armTargetPos = 63;
-                slideTargetPos = 50592;
+                armTargetPos = 65;
+                slideTargetPos = 38377;
                 break;
             case 3: // Climb High
-                armTargetPos = 63; // todo: get good angle
-                slideTargetPos = 0;
+                armTargetPos = 38; // todo: get good angle
+                slideTargetPos = 47655;
                 break;
             case 4: // Climb Low
-                armTargetPos = 63; // todo: get good angle
-                slideTargetPos = 1;
+                armTargetPos = 38; // todo: get good angle
+                slideTargetPos = 1000;
                 break;
             default:
                 throw new IllegalStateException("Unexpected position value: " + position); // todo: remove in comp
         }
 
-        slideTargetPos -= slideStartPos;
+        if (armSlidePos != -1) {
 
-        slidePower = 1;
-        if (slideLimit.isPressed()){;
-            slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            slideM.setTargetPosition(1000);
-        }else{
-            slideM.setTargetPosition((int) slideTargetPos);
+            slideTargetPos -= slideStartPos;
+
+            slidePower = 1;
+            if (slideLimit.isPressed()) {
+                slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                slideM.setTargetPosition(1000);
+            } else {
+                slideM.setTargetPosition((int) slideTargetPos);
+            }
+
+            slideM.setPower(slidePower);
+            slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-
-        slideM.setPower(slidePower);
-        slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         double armPower = armController.calculate(getArmAngle(), armTargetPos);
         armL.setPower(armPower);
@@ -170,14 +173,23 @@ public class Arm {
     }
 
     public void homeSlides(){
-        slideM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if (slideLimit.isPressed()){
+            slideM.setPower(0);
+            slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }else {
+            slideM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            slideM.setPower(-1);
+        }
+
+/*        slideM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slideM.setPower(-1);
         while (!slideLimit.isPressed()){
 
         }
         slideM.setPower(0);
         slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
     }
 
     public double getArmAngle(){
