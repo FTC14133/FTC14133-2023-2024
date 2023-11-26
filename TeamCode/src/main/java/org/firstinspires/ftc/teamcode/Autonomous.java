@@ -46,7 +46,7 @@ public class Autonomous extends LinearOpMode {
                 }
         }
 
-        Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(0));
 
         drive.setPoseEstimate(startPose);
 
