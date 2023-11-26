@@ -31,18 +31,22 @@ public class Autonomous extends LinearOpMode {
                     case "far":
                         startX = -35;
                         startY = -62;
+                        break;
                     case "close":
                         startX = 12;
                         startY = -62;
+                        break;
                 }
             case "blue":
                 switch (side){
                     case "far":
                         startX = -35;
                         startY = 80;
+                        break;
                     case "close":
                         startX = 12;
                         startY = 80;
+                        break;
                 }
         }
 
