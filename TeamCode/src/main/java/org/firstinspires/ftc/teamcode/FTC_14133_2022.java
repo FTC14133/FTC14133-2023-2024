@@ -43,18 +43,7 @@ public class  FTC_14133_2022 extends OpMode {
 
      telemetry.addData("slidepos", arm.getSlideLenght());
 
-     if (arm.getArmSlidePos() == 0){
-         intake.objpivot.GoToAngle(109);
-     }else{
-         double targetIntake = 68+arm.getArmAngle();
-         if (targetIntake < 82){
-             targetIntake = 82;
-         }else if (targetIntake > 270){
-             targetIntake = 270;
-         }
-         telemetry.addData("targetIntake", targetIntake);
-         intake.objpivot.GoToAngle(targetIntake);
-     }
+     intake.objpivot.updateIntakeAngle(arm);
 
      telemetry.update();
 
