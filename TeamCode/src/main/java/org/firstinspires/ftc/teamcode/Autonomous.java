@@ -22,7 +22,7 @@ public class Autonomous extends LinearOpMode {
         String spike = selectedArray[1];
         String side = selectedArray[2];
 
-/*        double startX = 0;
+        double startX = 0;
         double startY = 0;
 
         switch (alliance){
@@ -50,69 +50,34 @@ public class Autonomous extends LinearOpMode {
                 }
         }
 
-        Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(90));*/
-
-        Pose2d startPose = new Pose2d(-35, -64, 0);
-        Pose2d poseEstimate = startPose;
+        Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(90));
 
         drive.setPoseEstimate(startPose);
 
 
 
-        Trajectory RspikeL = drive.trajectoryBuilder(poseEstimate)
+        Trajectory RspikeL = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(-47, -40))
                 .build();
-        Trajectory RspikeC = drive.trajectoryBuilder(poseEstimate)
+        Trajectory RspikeC = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(-36, -36))
-                .lineToConstantHeading(new Vector2d(40, -36))
                 .build();
-        Trajectory RspikeR = drive.trajectoryBuilder(poseEstimate)
+        Trajectory RspikeR = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(-24, -36))
                 .build();
 
 
 
-        TrajectorySequence RstraightTo = drive.trajectorySequenceBuilder(poseEstimate)
-                .lineToConstantHeading(new Vector2d(40, -36))
-                .splineToConstantHeading(new Vector2d(61, -58), 0)
-                .build();
-
-        TrajectorySequence RfarLR = drive.trajectorySequenceBuilder(poseEstimate)
-                .lineToConstantHeading(new Vector2d(-36, -36))
-                .lineToConstantHeading(new Vector2d(-36, -11))
-                .lineToLinearHeading(new Pose2d(35, -11, Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(40, -36), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(61, -58), 0)
-                .build();
-
-
-
-
-
-        Trajectory BspikeL = drive.trajectoryBuilder(poseEstimate)
+        Trajectory BspikeL = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(-47, 40))
                 .build();
-        Trajectory BspikeC = drive.trajectoryBuilder(poseEstimate)
+        Trajectory BspikeC = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(-36, 36))
                 .build();
-        Trajectory BspikeR = drive.trajectoryBuilder(poseEstimate)
+        Trajectory BspikeR = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d(-24, 36))
                 .build();
 
-
-
-        TrajectorySequence BstraightTo = drive.trajectorySequenceBuilder(poseEstimate)
-                .lineToLinearHeading(new Pose2d(40, 36, Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(61, 58), 0)
-                .build();
-
-        TrajectorySequence BfarLR = drive.trajectorySequenceBuilder(poseEstimate)
-                .lineToConstantHeading(new Vector2d(-36, 36))
-                .lineToConstantHeading(new Vector2d(-36, 11))
-                .lineToLinearHeading(new Pose2d(35, 11, Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(40, 36), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(61, 58), 0)
-                .build();
 
 
 
@@ -128,22 +93,12 @@ public class Autonomous extends LinearOpMode {
                             break;
                         case "center":
                             drive.followTrajectory(RspikeC);
-/*                            telemetry.addData("** poseEstimate", drive.getPoseEstimate());
-                            telemetry.update();
-                            RstraightTo = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToConstantHeading(new Vector2d(40, -36))
-                                    //.splineToConstantHeading(new Vector2d(61, -58), 0)
-                                    .build();
-                            telemetry.addData("after poseEstimate", drive.getPoseEstimate());
-                            telemetry.update();
-                            drive.followTrajectorySequence(drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToConstantHeading(new Vector2d(40, -36))
-                                    //.splineToConstantHeading(new Vector2d(61, -58), 0)
-                                    .build());*/
                             break;
                     }
-                    //RstraightTo = updateStraightTo(drive);
-                    //switchSide(drive, side, spike, RstraightTo, RfarLR);
+                    TrajectorySequence RstraightTo = updateStraightTo(drive, alliance);
+                    TrajectorySequence RfarLR = updatefarLR(drive, alliance);
+
+                    switchSide(drive, side, spike, RstraightTo, RfarLR);
 
 
 
@@ -159,7 +114,9 @@ public class Autonomous extends LinearOpMode {
                             drive.followTrajectory(BspikeC);
                             break;
                     }
-                    BstraightTo = updateStraightTo(drive);
+                    TrajectorySequence BstraightTo = updateStraightTo(drive, alliance);
+                    TrajectorySequence BfarLR = updatefarLR(drive, alliance);
+
                     switchSide(drive, side, spike, BstraightTo, BfarLR);
 
 
@@ -168,17 +125,49 @@ public class Autonomous extends LinearOpMode {
 
     }
 
-    public TrajectorySequence updateStraightTo(SampleMecanumDrive drive){
+    public TrajectorySequence updateStraightTo(SampleMecanumDrive drive, String alliance){
 
         telemetry.addData("poseEstimate", drive.getPoseEstimate());
         telemetry.update();
 
+        int allianceSide = 1;
+
+        if (alliance.equals("red")){
+            allianceSide = 1;
+        }else{
+            allianceSide = -1;
+        }
+
         TrajectorySequence straightTo = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(40, -36))
-                //.splineToConstantHeading(new Vector2d(61, -58), 0)
+                .lineToConstantHeading(new Vector2d(40, (-36*allianceSide)))
+                .splineToConstantHeading(new Vector2d(61, (-58*allianceSide)), 0)
                 .build();
 
         return straightTo;
+    }
+
+    public TrajectorySequence updatefarLR(SampleMecanumDrive drive, String alliance){
+
+        telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        telemetry.update();
+
+        int allianceSide = 1;
+
+        if (alliance.equals("red")){
+            allianceSide = 1;
+        }else{
+            allianceSide = -1;
+        }
+
+        TrajectorySequence farLR = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .lineToConstantHeading(new Vector2d(-36, (-36*allianceSide)))
+                .lineToConstantHeading(new Vector2d(-36, (-11*allianceSide)))
+                .lineToLinearHeading(new Pose2d(35, (-11*allianceSide), Math.toRadians(180)))
+                .splineToConstantHeading(new Vector2d(40, (-36*allianceSide)), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(61, (-58*allianceSide)), 0)
+                .build();
+
+        return farLR;
     }
 
     public void switchSide(SampleMecanumDrive drive, String side, String spike, TrajectorySequence straightTo, TrajectorySequence farLR){
