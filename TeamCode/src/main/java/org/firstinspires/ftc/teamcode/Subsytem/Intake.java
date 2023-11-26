@@ -111,6 +111,20 @@ public class Intake {
             intakePivotR.setPower(pid);
         }
 
+        public void updateIntakeAngle(Arm arm){
+            if (arm.getArmSlidePos() == 0){
+                GoToAngle(109);
+            }else{
+                double targetIntake = 68+arm.getArmAngle();
+                if (targetIntake < 82){
+                    targetIntake = 82;
+                }else if (targetIntake > 270){
+                    targetIntake = 270;
+                }
+                GoToAngle(targetIntake);
+            }
+        }
+
     }
 }
 
