@@ -28,7 +28,7 @@ public class Autonomous extends LinearOpMode {
 
     State currentState = State.IDLE;
 
-    int armSlidePos = -1;
+    int armSlidePos = 1;
     double intakeState = 0;
 
     ElapsedTime intakeTimer = new ElapsedTime();
@@ -211,7 +211,8 @@ public class Autonomous extends LinearOpMode {
             drive.update();
 
             arm.GoToPosition(armSlidePos);
-            intake.objcatcher.runIntake(intakeState);
+            intake.objcatcher.runOutake(intakeState);
+            intake.objpivot.updateIntakeAngle(arm);
 
 
         }
