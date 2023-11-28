@@ -22,7 +22,7 @@ public class Autonomous extends LinearOpMode {
         String spike = selectedArray[1];
         String side = selectedArray[2];
 
-        double startX = 0;
+/*        double startX = 0;
         double startY = 0;
 
         switch (alliance){
@@ -50,82 +50,71 @@ public class Autonomous extends LinearOpMode {
                 }
         }
 
-        Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(90));*/
 
+        double startY = 0, startX = 0;
+
+        if (side.equals("far") && alliance.equals("red")){
+            startX = -35;
+            startY = -64;
+        }else if (side.equals("close") && alliance.equals("red")){
+            startX = 12;
+            startY = -64;
+        }else if (side.equals("far") && alliance.equals("blue")){
+            startX = -35;
+            startY = 64;
+        }else if (side.equals("close") && alliance.equals("blue")){
+            startX = 12;
+            startY = 64;
+        }
+
+        Pose2d startPose = new Pose2d(startX, startY, 0);
         drive.setPoseEstimate(startPose);
 
+        double sideFlip = 1;
+        if (side.equals("close")){
+            sideFlip = -1;
+        }
+
+        double allianceFlip = 1;
+        if (alliance.equals("blue")){
+            allianceFlip = -1;
+        }
 
 
-        Trajectory RspikeL = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(-47, -40))
+
+        Trajectory spikeL = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d((-47*sideFlip), (-42*allianceFlip)))
                 .build();
-        Trajectory RspikeC = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(-36, -36))
+        Trajectory spikeC = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d((-36*sideFlip), (-36*allianceFlip)))
                 .build();
-        Trajectory RspikeR = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(-24, -36))
+        Trajectory spikeR = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d((-24*sideFlip), (-42*allianceFlip)))
                 .build();
-
-
-
-        Trajectory BspikeL = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(-47, 40))
-                .build();
-        Trajectory BspikeC = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(-36, 36))
-                .build();
-        Trajectory BspikeR = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(-24, 36))
-                .build();
-
-
 
 
         if (!isStopRequested()){
-            switch (alliance){
-                case "red":
-                     switch (spike){
-                        case "left":
-                            drive.followTrajectory(RspikeL);
-                            break;
-                        case "right":
-                            drive.followTrajectory(RspikeR);
-                            break;
-                        case "center":
-                            drive.followTrajectory(RspikeC);
-                            break;
-                    }
-                    TrajectorySequence RstraightTo = updateStraightTo(drive, alliance);
-                    TrajectorySequence RfarLR = updatefarLR(drive, alliance);
+             switch (spike){
+                case "left":
+                    drive.followTrajectory(spikeL);
+                    break;
+                case "right":
+                    drive.followTrajectory(spikeR);
+                    break;
+                case "center":
+                    drive.followTrajectory(spikeC);
+                    break;
+            }
+            TrajectorySequence straightTo = updateStraightTo(drive, alliance, side);
+            TrajectorySequence farLR = updatefarLR(drive, alliance);
 
-                    switchSide(drive, side, spike, RstraightTo, RfarLR);
-
-
-
-                case "blue":
-                    switch (spike){
-                        case "left":
-                            drive.followTrajectory(BspikeL);
-                            break;
-                        case "right":
-                            drive.followTrajectory(BspikeR);
-                            break;
-                        case "center":
-                            drive.followTrajectory(BspikeC);
-                            break;
-                    }
-                    TrajectorySequence BstraightTo = updateStraightTo(drive, alliance);
-                    TrajectorySequence BfarLR = updatefarLR(drive, alliance);
-
-                    switchSide(drive, side, spike, BstraightTo, BfarLR);
-
+            switchSide(drive, side, spike, straightTo, farLR);
 
             }
         }
 
-    }
-
-    public TrajectorySequence updateStraightTo(SampleMecanumDrive drive, String alliance){
+    public TrajectorySequence updateStraightTo(SampleMecanumDrive drive, String alliance, String side){
 
         telemetry.addData("poseEstimate", drive.getPoseEstimate());
         telemetry.update();
@@ -138,7 +127,14 @@ public class Autonomous extends LinearOpMode {
             allianceSide = -1;
         }
 
+        double sideState = 1;
+
+        if (side.equals("close")){
+            sideState = -1;
+        }
+
         TrajectorySequence straightTo = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .lineToConstantHeading(new Vector2d((-36*sideState), (-39*allianceSide)))
                 .lineToConstantHeading(new Vector2d(40, (-36*allianceSide)))
                 .splineToConstantHeading(new Vector2d(61, (-58*allianceSide)), 0)
                 .build();
@@ -160,9 +156,9 @@ public class Autonomous extends LinearOpMode {
         }
 
         TrajectorySequence farLR = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-36, (-36*allianceSide)))
+                .lineToConstantHeading(new Vector2d(-36, (-48*allianceSide)))
                 .lineToConstantHeading(new Vector2d(-36, (-11*allianceSide)))
-                .lineToLinearHeading(new Pose2d(35, (-11*allianceSide), Math.toRadians(180)))
+                .lineToConstantHeading(new Vector2d(35, (-11*allianceSide)))
                 .splineToConstantHeading(new Vector2d(40, (-36*allianceSide)), Math.toRadians(180))
                 .splineToConstantHeading(new Vector2d(61, (-58*allianceSide)), 0)
                 .build();
