@@ -71,12 +71,12 @@ public class Autonomous extends LinearOpMode {
         Pose2d startPose = new Pose2d(startX, startY, 0);
         drive.setPoseEstimate(startPose);
 
-        double sideFlip = 1;
+        int sideFlip = 1;
         if (side.equals("close")){
             sideFlip = -1;
         }
 
-        double allianceFlip = 1;
+        int allianceFlip = 1;
         if (alliance.equals("blue")){
             allianceFlip = -1;
         }
@@ -106,8 +106,8 @@ public class Autonomous extends LinearOpMode {
                     drive.followTrajectory(spikeC);
                     break;
             }
-            TrajectorySequence straightTo = updateStraightTo(drive, alliance, side);
-            TrajectorySequence farLR = updatefarLR(drive, alliance);
+            TrajectorySequence straightTo = updateStraightTo(drive, allianceFlip, sideFlip);
+            TrajectorySequence farLR = updatefarLR(drive, allianceFlip);
 
             switchSide(drive, side, spike, straightTo, farLR);
 
