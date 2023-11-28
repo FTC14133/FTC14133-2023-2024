@@ -11,6 +11,17 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(group = "autoFTC14133")
 public class Autonomous extends LinearOpMode {
 
+    static final String SPIKE_CENTER = "center";
+    static final String SPIKE_LEFT = "left";
+    static final String SPIKE_RIGHT = "right";
+
+    static final String SIDE_FAR = "far";
+    static final String SIDE_CLOSE = "close";
+
+    static final String ALLIANCE_RED = "red";
+    static final String ALLIANCE_BLUE = "blue";
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         // Creating Drivetrain
@@ -22,48 +33,20 @@ public class Autonomous extends LinearOpMode {
         String spike = selectedArray[1];
         String side = selectedArray[2];
 
-/*        double startX = 0;
-        double startY = 0;
 
-        switch (alliance){
-            case "red":
-                switch (side){
-                    case "far":
-                        startX = -35;
-                        startY = 62;
-                        break;
-                    case "close":
-                        startX = 12;
-                        startY = 62;
-                        break;
-                }
-            case "blue":
-                switch (side){
-                    case "far":
-                        startX = -35;
-                        startY = 80;
-                        break;
-                    case "close":
-                        startX = 12;
-                        startY = 80;
-                        break;
-                }
-        }
-
-        Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(90));*/
 
         double startY = 0, startX = 0;
 
-        if (side.equals("far") && alliance.equals("red")){
+        if (side.equals(SIDE_FAR) && alliance.equals(ALLIANCE_RED)){
             startX = -35;
             startY = -64;
-        }else if (side.equals("close") && alliance.equals("red")){
+        }else if (side.equals(SIDE_CLOSE) && alliance.equals(ALLIANCE_RED)){
             startX = 12;
             startY = -64;
-        }else if (side.equals("far") && alliance.equals("blue")){
+        }else if (side.equals(SIDE_FAR) && alliance.equals(ALLIANCE_BLUE)){
             startX = -35;
             startY = 64;
-        }else if (side.equals("close") && alliance.equals("blue")){
+        }else if (side.equals(SIDE_CLOSE) && alliance.equals(ALLIANCE_BLUE)){
             startX = 12;
             startY = 64;
         }
@@ -72,12 +55,12 @@ public class Autonomous extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         int sideFlip = 1;
-        if (side.equals("close")){
+        if (side.equals(SIDE_CLOSE)){
             sideFlip = -1;
         }
 
         int allianceFlip = 1;
-        if (alliance.equals("blue")){
+        if (alliance.equals(ALLIANCE_BLUE)){
             allianceFlip = -1;
         }
 
@@ -95,14 +78,14 @@ public class Autonomous extends LinearOpMode {
 
 
         if (!isStopRequested()){
-             switch (spike){
-                case "left":
+            switch (spike){
+                case SPIKE_LEFT:
                     drive.followTrajectory(spikeL);
                     break;
-                case "right":
+                case SPIKE_RIGHT:
                     drive.followTrajectory(spikeR);
                     break;
-                case "center":
+                case SPIKE_CENTER:
                     drive.followTrajectory(spikeC);
                     break;
             }
@@ -142,17 +125,17 @@ public class Autonomous extends LinearOpMode {
 
     public void switchSide(SampleMecanumDrive drive, String side, String spike, TrajectorySequence straightTo, TrajectorySequence farLR){
         switch (side){
-            case "close":
+            case SIDE_CLOSE:
                 drive.followTrajectorySequence(straightTo);
                 break;
-            case "far":
+            case SIDE_FAR:
                 switch (spike) {
 
-                    case "right": case "left":
+                    case SPIKE_RIGHT: case SPIKE_LEFT:
                         drive.followTrajectorySequence(farLR);
                         break;
 
-                    case "center":
+                    case SPIKE_CENTER:
                         drive.followTrajectorySequence(straightTo);
                         break;
                 }
@@ -161,54 +144,44 @@ public class Autonomous extends LinearOpMode {
 
     public String[] autoSelector(){
         // Auto Selector
-        String alliance = "blue";
-        String spike = "left";
-        String side = "close";
-        String lrFMode = "top";
+        String alliance = ALLIANCE_BLUE;
+        String spike = SPIKE_LEFT;
+        String side = SIDE_CLOSE;
 
         while (!opModeIsActive() && !isStopRequested()){
             if (gamepad1.x){
-                alliance = "blue";
+                alliance = ALLIANCE_BLUE;
             }else if (gamepad1.b){
-                alliance = "red";
+                alliance = ALLIANCE_RED;
             }
             telemetry.addData("Select Alliance (Gamepad1 X = Blue, Gamepad1 B = Red)", "");
             telemetry.addData("Current Alliance Selected : ", alliance.toUpperCase());
             telemetry.addData("", "");
 
             if (gamepad1.dpad_left){
-                spike = "left";
+                spike = SPIKE_LEFT;
             }else if (gamepad1.dpad_right){
-                spike = "right";
+                spike = SPIKE_RIGHT;
             }else if (gamepad1.dpad_up){
-                spike = "center";
+                spike = SPIKE_CENTER;
             }
             telemetry.addData("Select Spike Mark (Gamepad1 D-PAD Left = Left Spike, Gamepad1 D-PAD Up = Center Spike, Gamepad1 D-PAD Right = Right Spike)", "");
             telemetry.addData("Current Spike Mark Selected : ", spike.toUpperCase());
             telemetry.addData("", "");
 
             if (gamepad1.y){
-                side = "far";
+                side = SIDE_FAR;
             }else if (gamepad1.a){
-                side = "close";
+                side = SIDE_CLOSE;
             }
             telemetry.addData("Select Side (Gamepad1 Y = Far, Gamepad1 A = Close)", "");
             telemetry.addData("Current Side Selected : ", side.toUpperCase());
             telemetry.addData("", "");
 
-            if (gamepad1.right_bumper){
-                lrFMode = "top";
-            }else if (gamepad1.left_bumper){
-                lrFMode = "bottom";
-            }
-            telemetry.addData("Select Left/Right Far Mode (Gamepad1 Right Bumper = Top, Gamepad1 Left Bumper = Bottom)", "");
-            telemetry.addData("Current Left/Right Far Mode Selected : ", lrFMode.toUpperCase());
-            telemetry.addData("", "");
-
             telemetry.update();
         }
 
-        return new String[] {alliance, spike, side, lrFMode};
+        return new String[] {alliance, spike, side};
 
     }
 
