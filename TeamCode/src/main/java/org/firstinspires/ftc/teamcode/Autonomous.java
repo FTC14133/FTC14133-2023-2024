@@ -212,7 +212,7 @@ public class Autonomous extends LinearOpMode {
 
             arm.GoToPosition(armSlidePos);
             intake.objcatcher.runOutake(intakeState);
-            intake.objpivot.updateIntakeAngle(arm);
+            intake.objpivot.updateIntakeAngle(arm, telemetry);
 
 
         }

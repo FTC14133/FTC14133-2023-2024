@@ -61,22 +61,22 @@ public class Intake {
             outtake.setPower(suckerSpeed *outtakeState);
         }
 
-        public void Teleop(Gamepad gamepad2, Telemetry telemetry) { //Code to be run in Op Mode void Loop at top level
+        public void Teleop(Gamepad gamepad1, Telemetry telemetry) { //Code to be run in Op Mode void Loop at top level
 
             int intakeState = 0;
             int outtakeState = 0;
 
-            if (gamepad2.y){ //Intake
+            if (gamepad1.y){ //Intake
                 intakeState = 1;
-            }else if (gamepad2.b){ //Reverse Intake
+            }else if (gamepad1.b){ //Reverse Intake
                 intakeState = -1;
             }else{
                 intakeState = 0;
             }
 
-            if (gamepad2.x){ //Outtake
+            if (gamepad1.x){ //Outtake
                 outtakeState = 1;
-            }else if (gamepad2.a){ //Reverse Outtake
+            }else if (gamepad1.a){ //Reverse Outtake
                 outtakeState = -1;
             }else{
                 outtakeState = 0;
@@ -95,34 +95,44 @@ public class Intake {
     }
 
     public class Pivot {
-        public double getIntakeAngle(){
+        public double getIntakeAngle(Telemetry telemetry){
             double PNPVoltage = pivotIntakePNP.getVoltage();
+
+            telemetry.addData("intake voltage", (pivotIntakePNP.getVoltage()));
 
             return (degpervoltage*PNPVoltage);
         }
 
-        public void GoToAngle(double angle){
+        public void GoToAngle(double angle, Telemetry telemetry){
             intakeTargetPos = angle;
 
-            double currentPos = getIntakeAngle();
+            double currentPos = getIntakeAngle(telemetry);
             double pid = intakePController.calculate(currentPos, intakeTargetPos);
 
             intakePivotL.setPower(pid);
             intakePivotR.setPower(pid);
         }
 
-        public void updateIntakeAngle(Arm arm){
+        public void updateIntakeAngle(Arm arm, Telemetry telemetry){
+
+            double targetIntake;
             if (arm.getArmSlidePos() == 0){
-                GoToAngle(109);
-            }else{
-                double targetIntake = 68+arm.getArmAngle();
+                targetIntake = 147;
+                GoToAngle(targetIntake, telemetry);
+            }
+            else
+            {
+                targetIntake = 70+arm.getArmAngle();
                 if (targetIntake < 82){
                     targetIntake = 82;
-                }else if (targetIntake > 270){
+                }
+                else if (targetIntake > 270){
                     targetIntake = 270;
                 }
-                GoToAngle(targetIntake);
+                GoToAngle(targetIntake,telemetry);
             }
+
+            telemetry.addData("intake target", targetIntake);
         }
 
     }

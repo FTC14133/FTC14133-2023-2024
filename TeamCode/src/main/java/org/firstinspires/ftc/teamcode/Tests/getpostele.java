@@ -33,7 +33,7 @@ public class getpostele extends OpMode {
 
         telemetry.addData("getArmSlidePos", arm.getArmSlidePos());
         telemetry.addData("getSlideLenght", arm.getSlideLenght());
-        telemetry.addData("getIntakeAngle", intake.objpivot.getIntakeAngle());
+        telemetry.addData("getIntakeAngle", intake.objpivot.getIntakeAngle(telemetry));
 
     }
 

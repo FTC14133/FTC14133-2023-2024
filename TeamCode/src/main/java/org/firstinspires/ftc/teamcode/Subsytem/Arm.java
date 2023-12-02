@@ -127,7 +127,7 @@ public class Arm {
                 slideTargetPos = 0;
                 break;
             case 0: // Intake 96
-                armTargetPos = 102;
+                armTargetPos = 102.5;
                 slideTargetPos = 38377;
                 break;
             case 1: // Low Place

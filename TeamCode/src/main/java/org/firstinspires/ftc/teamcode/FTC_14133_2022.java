@@ -18,7 +18,7 @@ public class  FTC_14133_2022 extends OpMode {
     private Arm arm=null;
     private Intake intake=null;
 
-    SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+    private SampleMecanumDrive drive=null;
 
 
 
@@ -27,25 +27,25 @@ public class  FTC_14133_2022 extends OpMode {
      arm = new Arm(hardwareMap);
      intake = new Intake(hardwareMap);
 
-     drive = new Drive(hardwareMap);
+     drive = new SampleMecanumDrive(hardwareMap);
      drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
  }
 
- public void start() {
-     telemetry.addData("Status", "Start");
+ public void init_loop() {
+     telemetry.addData("Status", "Init Loop");
      telemetry.update();
 
-     //arm.homeSlides();
+     arm.homeSlides();
  }
 
 
  public void loop() {
      telemetry.addData("Status", "Looping");
 
-     intake.objcatcher.Teleop(gamepad2, telemetry);
-     telemetry.addData("intake", intake.objpivot.getIntakeAngle());
+     intake.objcatcher.Teleop(gamepad1, telemetry);
+     telemetry.addData("intake", intake.objpivot.getIntakeAngle(telemetry));
 
      if (gamepad2.left_stick_button){
          arm.homeSlides();
@@ -55,7 +55,7 @@ public class  FTC_14133_2022 extends OpMode {
 
      telemetry.addData("slidepos", arm.getSlideLenght());
 
-     intake.objpivot.updateIntakeAngle(arm);
+     intake.objpivot.updateIntakeAngle(arm, telemetry);
 
 
 
