@@ -32,7 +32,7 @@ public class Arm {
     int armSlidePos = 0;
     String clicklast = "b";
 
-    int armMax = 4;
+    int armMax = 5;
     int armMin = 0;
 
     double armTargetPos = 0;
@@ -43,6 +43,12 @@ public class Arm {
     final double degpervoltage = 270/3.3;
 
     double slidePower = 1;
+
+    final double slideCountsPerInch = 19970.0/5.0; //Counts Per Inch
+
+
+
+
 
     public Arm(HardwareMap hardwareMap){
         slideM = hardwareMap.get(DcMotorEx.class, "slideM");
@@ -64,16 +70,16 @@ public class Arm {
         armController = new PIDFController(armP, armI, armD, armFF);
     }
 
-    public void Teleop(Gamepad gamepad2, Telemetry telemetry){
+    public void Teleop(Gamepad gamepad2, Telemetry telemetry, Intake intake){
         if (toggleArm && (gamepad2.dpad_up || gamepad2.dpad_down)) {  // Only execute once per Button push
             toggleArm = false;  // Prevents this section of code from being called again until the Button is released and re-pressed
             if (gamepad2.dpad_down) {  // If the d-pad up button is pressed
-                armSlidePos = armSlidePos + 1; //Increase Arm position
+                armSlidePos = armSlidePos - 1; //Increase Arm position
                 if (armSlidePos > armMax) { //If arm position is above 3
                     armSlidePos = armMax; //Cap it at 3
                 }
             } else if (gamepad2.dpad_up) { // If d-pad down button is pressed
-                armSlidePos = armSlidePos - 1; //Decrease arm position
+                armSlidePos = armSlidePos + 1; //Decrease arm position
                 if (armSlidePos < armMin) { //If arm position is below -3
                     armSlidePos = armMin; //cap it at -3
                 }
@@ -114,37 +120,41 @@ public class Arm {
         }
 
 
-        GoToPosition(armSlidePos);
+        GoToPosition(armSlidePos, intake, telemetry);
     }
 
-    public void GoToPosition(int position){
+    public void GoToPosition(int position, Intake intake, Telemetry telemetry){
 
         armSlidePos = position; // to update in auto, redundant in teleop
 
         switch (armSlidePos){
             case -1:
-                armTargetPos = 111;
+                armTargetPos = 114;
                 slideTargetPos = 0;
                 break;
             case 0: // Intake 96
-                armTargetPos = 102.5;
-                slideTargetPos = 38377;
+                armTargetPos = 102.35;
+                slideTargetPos = 7.5*slideCountsPerInch;
                 break;
             case 1: // Low Place
                 armTargetPos = 68;
-                slideTargetPos = 38377;
+                slideTargetPos = 8*slideCountsPerInch;
                 break;
             case 2: // Medium Place
-                armTargetPos = 65;
-                slideTargetPos = 38377;
+                armTargetPos = 63;
+                slideTargetPos = 47994;
                 break;
-            case 3: // Climb High
-                armTargetPos = 38; // todo: get good angle
-                slideTargetPos = 47655;
+            case 3: // High Place
+                armTargetPos = 61;
+                slideTargetPos = 54114;
                 break;
-            case 4: // Climb Low
-                armTargetPos = 38; // todo: get good angle
-                slideTargetPos = 1000;
+            case 4: // Climb High
+                armTargetPos = 37;
+                slideTargetPos = 53311;
+                break;
+            case 5: // Climb Low
+                armTargetPos = 37;
+                slideTargetPos = 26475;
                 break;
             default:
                 throw new IllegalStateException("Unexpected position value: " + position); // todo: remove in comp
@@ -162,11 +172,26 @@ public class Arm {
                 slideM.setTargetPosition((int) slideTargetPos);
             }
 
+            if (slideM.getTargetPosition() >= 54306){
+                slidePower = 0;
+            }
+
             slideM.setPower(slidePower);
             slideM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        double armPower = armController.calculate(getArmAngle(), armTargetPos);
+        double armPower = (armController.calculate(getArmAngle(), armTargetPos));
+
+        double currentIntake = intake.objpivot.getIntakeAngle(telemetry);
+        double targetIntake = intake.objpivot.getIntakeTargetPos();
+
+        if ((!((currentIntake > (targetIntake-5)) && (currentIntake < (targetIntake+5)))) && armSlidePos == 0){
+            armPower = 0;
+            telemetry.addData("inside", "arm stopper");
+        }
+
+        telemetry.addData("inside range", !((currentIntake > (targetIntake-5)) && (currentIntake < (targetIntake+5))));
+        telemetry.addData("on arm pos 0", armSlidePos != 0);
         armL.setPower(armPower);
         armR.setPower(armPower);
 

@@ -28,9 +28,13 @@ public class Intake {
     final double suckerSpeed = 1; // todo: figure out good speed
     final double degpervoltage = 270/3.3;
 
+    double intakeOffset = 0;
+
     double  intakeTargetPos = 0; // todo: see what starting pos we want
     public Catcher objcatcher;
     public Pivot objpivot;
+
+    double targetIntake = 0;
 
     public Intake(HardwareMap hardwareMap){                 // Motor Mapping
         intake = hardwareMap.get(DcMotorEx.class, "intakeM");
@@ -95,12 +99,34 @@ public class Intake {
     }
 
     public class Pivot {
+        public void setIntakeOffset(double offset){
+            intakeOffset = offset;
+        }
+
+        public void manualPivot(Gamepad gamepad2){
+            intakePivotL.setPower(gamepad2.left_stick_y);
+            intakePivotR.setPower(gamepad2.left_stick_y);
+        }
+
         public double getIntakeAngle(Telemetry telemetry){
             double PNPVoltage = pivotIntakePNP.getVoltage();
 
             telemetry.addData("intake voltage", (pivotIntakePNP.getVoltage()));
+            double currentAngle = (degpervoltage*PNPVoltage);
+/*            if (doneReset){
+                pastAngle = currentAngle;
+                doneReset = false;
+            }
+            if (Math.abs((pastAngle-intakeOffset) - currentAngle) > 35){
+                intakeOffset += (pastAngle-intakeOffset)-currentAngle;
+            }
 
-            return (degpervoltage*PNPVoltage);
+            telemetry.addData("intake pure", (currentAngle));
+            currentAngle += intakeOffset;
+            telemetry.addData("intake offseted", (currentAngle));
+
+            pastAngle = currentAngle;*/
+            return currentAngle;
         }
 
         public void GoToAngle(double angle, Telemetry telemetry){
@@ -115,14 +141,17 @@ public class Intake {
 
         public void updateIntakeAngle(Arm arm, Telemetry telemetry){
 
-            double targetIntake;
-            if (arm.getArmSlidePos() == 0){
-                targetIntake = 147;
+            if ((arm.getArmSlidePos() == 0) || (arm.getArmSlidePos() == 4) || (arm.getArmSlidePos() == 5)){
+                telemetry.addData("In Intake", "pickup");
+                targetIntake = 113;
                 GoToAngle(targetIntake, telemetry);
+            }else if (arm.getArmSlidePos() == -1){
+                GoToAngle(83, telemetry);
             }
             else
             {
-                targetIntake = 70+arm.getArmAngle();
+                telemetry.addData("In Intake", "backdrop align");
+                targetIntake = 99+arm.getArmAngle();
                 if (targetIntake < 82){
                     targetIntake = 82;
                 }
@@ -133,6 +162,10 @@ public class Intake {
             }
 
             telemetry.addData("intake target", targetIntake);
+        }
+
+        public double getIntakeTargetPos(){
+            return targetIntake;
         }
 
     }

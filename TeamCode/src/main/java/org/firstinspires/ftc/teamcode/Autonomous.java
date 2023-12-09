@@ -11,11 +11,20 @@ import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.Subsytem.Arm;
 import org.firstinspires.ftc.teamcode.Subsytem.Intake;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(group = "autoFTC14133")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(group = "StateTest")
 public class Autonomous extends LinearOpMode {
 
-    private Arm arm=null;
-    private Intake intake=null;
+    static final String SPIKE_CENTER = "center";
+    static final String SPIKE_LEFT = "left";
+    static final String SPIKE_RIGHT = "right";
+
+    static final String SIDE_FAR = "far";
+    static final String SIDE_CLOSE = "close";
+
+    static final String ALLIANCE_RED = "red";
+    static final String ALLIANCE_BLUE = "blue";
+
+
 
     enum State {
         SPIKE,
@@ -28,10 +37,10 @@ public class Autonomous extends LinearOpMode {
 
     State currentState = State.IDLE;
 
-    int armSlidePos = 1;
-    double intakeState = 0;
+    int armSlidePos = -1;
 
-    ElapsedTime intakeTimer = new ElapsedTime();
+    private Arm arm=null;
+    private Intake intake=null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -45,96 +54,76 @@ public class Autonomous extends LinearOpMode {
 
         String alliance = selectedArray[0];
         String spike = selectedArray[1];
+        if (alliance.equals(ALLIANCE_BLUE) && !(spike.equals(SPIKE_CENTER))){
+            if (spike.equals(SPIKE_LEFT)){
+                spike = SPIKE_RIGHT;
+            }else if (spike.equals(SPIKE_RIGHT)){
+                spike = SPIKE_LEFT;
+            }
+        }
         String side = selectedArray[2];
 
-        double startX = 0;
-        double startY = 0;
+        double startY = 0, startX = 0;
 
-        switch (alliance){
-            case "red":
-                switch (side){
-                    case "far":
-                        startX = -35;
-                        startY = -62;
-                        break;
-                    case "close":
-                        startX = 12;
-                        startY = -62;
-                }
-            case "blue":
-                switch (side){
-                    case "far":
-                        startX = -35;
-                        startY = 80;
-                        break;
-                    case "close":
-                        startX = 12;
-                        startY = 80;
-                }
+        if (side.equals(SIDE_FAR) && alliance.equals(ALLIANCE_RED)){
+            startX = -35;
+            startY = -64;
+        }else if (side.equals(SIDE_CLOSE) && alliance.equals(ALLIANCE_RED)){
+            startX = 12;
+            startY = -64;
+        }else if (side.equals(SIDE_FAR) && alliance.equals(ALLIANCE_BLUE)){
+            startX = -35;
+            startY = 64;
+        }else if (side.equals(SIDE_CLOSE) && alliance.equals(ALLIANCE_BLUE)){
+            startX = 12;
+            startY = 64;
         }
 
         Pose2d startPose = new Pose2d(startX, startY, Math.toRadians(0));
-
         drive.setPoseEstimate(startPose);
 
 
+        double sideOffset = 0;
+        if (side.equals(SIDE_CLOSE)){
+            sideOffset = 47;
+        }
 
-        Trajectory RspikeL = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-47, -40))
+        int allianceFlip = 1;
+        if (alliance.equals(ALLIANCE_BLUE)){
+            allianceFlip = -1;
+        }
+
+
+
+        Trajectory spikeL = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d((-47+sideOffset), (-42*allianceFlip)))
                 .build();
-        Trajectory RspikeC = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-36, -36))
+        Trajectory spikeC = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d((-36+sideOffset), (-36*allianceFlip)))
                 .build();
-        Trajectory RspikeR = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-24, -36))
-                .build();
-
-
-
-        TrajectorySequence RstraightTo = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(40, -36, Math.toRadians(180)))
-                .build();
-
-        TrajectorySequence RfarLR = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(-36, -36))
-                .lineToConstantHeading(new Vector2d(-36, -11))
-                .lineToLinearHeading(new Pose2d(35, -11, Math.toRadians(180)))
-                .splineToConstantHeading(new Vector2d(40, -36), Math.toRadians(180))
-                .build();
-
-
-
-        Trajectory RbackL = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(40, -30))
-                .build();
-
-        Trajectory RbackC = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(40, -36))
-                .build();
-
-        Trajectory RbackR = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(40, -42))
-                .build();
-
-
-        Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .splineToConstantHeading(new Vector2d(61, -58), 0)
+        Trajectory spikeR = drive.trajectoryBuilder(startPose)
+                .lineToConstantHeading(new Vector2d((-24+sideOffset), (-42*allianceFlip)))
                 .build();
 
 
 
         currentState = State.SPIKE;
         switch (spike){
-            case "left":
-                drive.followTrajectoryAsync(RspikeL);
+            case SPIKE_LEFT:
+                drive.followTrajectoryAsync(spikeL);
                 break;
-            case "right":
-                drive.followTrajectoryAsync(RspikeR);
+            case SPIKE_RIGHT:
+                drive.followTrajectoryAsync(spikeR);
                 break;
-            case "center":
-                drive.followTrajectoryAsync(RspikeC);
+            case SPIKE_CENTER:
+                drive.followTrajectoryAsync(spikeC);
                 break;
         }
+
+        ElapsedTime intakeTimer = new ElapsedTime();
+        ElapsedTime armTimer = new ElapsedTime();
+        boolean resetArmTimer = true;
+        int outtakeState = 0;
 
         while (opModeIsActive() && !isStopRequested()) {
             switch (currentState){
@@ -142,19 +131,19 @@ public class Autonomous extends LinearOpMode {
                     if (!drive.isBusy()){
                         currentState = State.BACKDROP;
 
-                        armSlidePos = 1;
+                        //armSlidePos = 1;
 
                         switch (side){
-                            case "close":
-                                drive.followTrajectorySequenceAsync(RstraightTo);
+                            case SIDE_CLOSE:
+                                drive.followTrajectorySequenceAsync(updateStraightTo(drive, allianceFlip, sideOffset));
                                 break;
-                            case "far":
+                            case SIDE_FAR:
                                 switch (spike){
-                                    case "left": case "right":
-                                        drive.followTrajectorySequenceAsync(RfarLR);
+                                    case SPIKE_LEFT: case SPIKE_RIGHT:
+                                        drive.followTrajectorySequenceAsync(updatefarLR(drive, allianceFlip));
                                         break;
-                                    case "center":
-                                        drive.followTrajectorySequenceAsync(RstraightTo);
+                                    case SPIKE_CENTER:
+                                        drive.followTrajectorySequenceAsync(updateStraightTo(drive, allianceFlip, sideOffset));
                                         break;
                                 }
                         }
@@ -165,36 +154,47 @@ public class Autonomous extends LinearOpMode {
                     if (!drive.isBusy()){
                         currentState = State.ALIGN;
 
+                        double yBack = 0;
                         switch (spike) {
-                            case "left":
-                                drive.followTrajectoryAsync(RbackL);
+                            case SPIKE_LEFT:
+                                yBack = -30;
                                 break;
-                            case "right":
-                                drive.followTrajectoryAsync(RbackR);
+                            case SPIKE_RIGHT:
+                                yBack = -42;
                                 break;
-                            case "center":
-                                drive.followTrajectoryAsync(RbackC);
+                            case SPIKE_CENTER:
+                                yBack = -36;
                                 break;
                         }
+
+                        if (alliance.equals(ALLIANCE_BLUE)){
+                            yBack += 72;
+                        }
+
+                        drive.followTrajectoryAsync(updateBackAlign(drive, yBack));
                     }
                     break;
 
                 case ALIGN:
-                    if (!drive.isBusy()){
+                    if (!drive.isBusy() && resetArmTimer){
+                        resetArmTimer = false;
+                        armTimer.reset();
+                    }
+                    if (armTimer.seconds() >= 7.5 && !resetArmTimer){
                         currentState = State.PLACE;
 
-                        intakeState = 1;
+                        outtakeState = 1;
                         intakeTimer.reset();
 
                     }
                     break;
 
                 case PLACE:
-                    if (intakeTimer.seconds() == 2.0){
-                        intakeState = 0;
+                    if (intakeTimer.seconds() >= 2.0){
+                        outtakeState = 0;
 
                         currentState = State.PARK;
-                        drive.followTrajectoryAsync(park);
+                        drive.followTrajectoryAsync(updatePark(drive, allianceFlip));
                     }
                     break;
 
@@ -210,65 +210,104 @@ public class Autonomous extends LinearOpMode {
 
             drive.update();
 
-            arm.GoToPosition(armSlidePos);
-            intake.objcatcher.runOutake(intakeState);
+            arm.GoToPosition(armSlidePos, intake, telemetry);
             intake.objpivot.updateIntakeAngle(arm, telemetry);
+            intake.objcatcher.runOutake(outtakeState);
 
 
         }
 
     }
 
+    public TrajectorySequence updateStraightTo(SampleMecanumDrive drive, int allianceFlip, double sideOffset){
+
+        telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        telemetry.update();
+
+        return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .lineToConstantHeading(new Vector2d((-36+sideOffset), (-39*allianceFlip)))
+                .lineToConstantHeading(new Vector2d(40, (-36*allianceFlip)))
+                .build();
+    }
+
+    public TrajectorySequence updatefarLR(SampleMecanumDrive drive, int allianceFlip){
+
+        telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        telemetry.update();
+
+        return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+
+                .addSpatialMarker(new Vector2d(9, -11*(allianceFlip)), () -> {
+                    armSlidePos = 1;
+                })
+
+                .lineToConstantHeading(new Vector2d(-36, (-48*allianceFlip)))
+                .lineToConstantHeading(new Vector2d(-33, (-11*allianceFlip)))
+                .lineToConstantHeading(new Vector2d(35, (-11*allianceFlip)))
+                .splineToConstantHeading(new Vector2d(40, (-36*allianceFlip)), Math.toRadians(180))
+                .build();
+    }
+
+    public Trajectory updateBackAlign(SampleMecanumDrive drive, double yValue){
+
+        telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        telemetry.update();
+
+        return drive.trajectoryBuilder(drive.getPoseEstimate())
+                .lineToConstantHeading(new Vector2d(40, yValue))
+                .build();
+    }
+
+    public Trajectory updatePark(SampleMecanumDrive drive, int allianceFlip){
+
+        telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        telemetry.update();
+
+        return drive.trajectoryBuilder(drive.getPoseEstimate())
+                .splineToConstantHeading(new Vector2d(59, (-64*allianceFlip)), Math.toRadians(0))
+                .build();
+    }
+
     public String[] autoSelector(){
         // Auto Selector
-        String alliance = "blue";
-        String spike = "left";
-        String side = "close";
-        String lrFMode = "top";
+        String alliance = ALLIANCE_BLUE;
+        String spike = SPIKE_LEFT;
+        String side = SIDE_CLOSE;
 
         while (!opModeIsActive() && !isStopRequested()){
             if (gamepad1.x){
-                alliance = "blue";
+                alliance = ALLIANCE_BLUE;
             }else if (gamepad1.b){
-                alliance = "red";
+                alliance = ALLIANCE_RED;
             }
             telemetry.addData("Select Alliance (Gamepad1 X = Blue, Gamepad1 B = Red)", "");
             telemetry.addData("Current Alliance Selected : ", alliance.toUpperCase());
             telemetry.addData("", "");
 
             if (gamepad1.dpad_left){
-                spike = "left";
+                spike = SPIKE_LEFT;
             }else if (gamepad1.dpad_right){
-                spike = "right";
+                spike = SPIKE_RIGHT;
             }else if (gamepad1.dpad_up){
-                spike = "center";
+                spike = SPIKE_CENTER;
             }
             telemetry.addData("Select Spike Mark (Gamepad1 D-PAD Left = Left Spike, Gamepad1 D-PAD Up = Center Spike, Gamepad1 D-PAD Right = Right Spike)", "");
             telemetry.addData("Current Spike Mark Selected : ", spike.toUpperCase());
             telemetry.addData("", "");
 
             if (gamepad1.y){
-                side = "far";
+                side = SIDE_FAR;
             }else if (gamepad1.a){
-                side = "close";
+                side = SIDE_CLOSE;
             }
             telemetry.addData("Select Side (Gamepad1 Y = Far, Gamepad1 A = Close)", "");
             telemetry.addData("Current Side Selected : ", side.toUpperCase());
             telemetry.addData("", "");
 
-            if (gamepad1.right_bumper){
-                lrFMode = "top";
-            }else if (gamepad1.left_bumper){
-                lrFMode = "bottom";
-            }
-            telemetry.addData("Select Left/Right Far Mode (Gamepad1 Right Bumper = Top, Gamepad1 Left Bumper = Bottom)", "");
-            telemetry.addData("Current Left/Right Far Mode Selected : ", lrFMode.toUpperCase());
-            telemetry.addData("", "");
-
             telemetry.update();
         }
 
-        return new String[] {alliance, spike, side, lrFMode};
+        return new String[] {alliance, spike, side};
 
     }
 

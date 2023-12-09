@@ -36,7 +36,7 @@ public class AutoStartPos extends OpMode {
         telemetry.addData("getIntakeAngle", intake.objpivot.getIntakeAngle(telemetry));
 
         arm.homeSlides();
-        arm.GoToPosition(-1);
+        arm.GoToPosition(-1, intake, telemetry);
         intake.objpivot.GoToAngle(83,telemetry);
 
         telemetry.update();
