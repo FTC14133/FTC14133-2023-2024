@@ -25,9 +25,6 @@ public class Arm {
     public static double armP = 0.1, armI = 0, armD = 0.00001, armFF = -0.001;
 
     boolean toggleArm = true;
-    boolean toggleClimb = true;
-
-    int climbOnOff = 1;
 
     int armSlidePos = 0;
     String clicklast = "b";
@@ -45,9 +42,6 @@ public class Arm {
     double slidePower = 1;
 
     final double slideCountsPerInch = 19970.0/5.0; //Counts Per Inch
-
-
-
 
 
     public Arm(HardwareMap hardwareMap){
@@ -100,23 +94,9 @@ public class Arm {
         }else if (gamepad2.x){
             armSlidePos = 2;
             clicklast = "x";
-        }
-
-
-        if (gamepad2.back && toggleClimb){
-            toggleClimb = false;
-            climbOnOff *= -1;
-            clicklast = "back";
-        }else if (!gamepad2.back){
-            toggleClimb = false;
-        }
-
-        if (clicklast.equals("back")) {
-            if (climbOnOff == 1) {
-                armSlidePos = 3;
-            } else if (climbOnOff == -1) {
-                armSlidePos = 4;
-            }
+        }else if (gamepad2.y){
+            armSlidePos = 3;
+            clicklast = "y";
         }
 
 

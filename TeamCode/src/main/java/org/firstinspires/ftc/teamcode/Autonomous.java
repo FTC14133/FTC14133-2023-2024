@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Subsytem.Arm;
 import org.firstinspires.ftc.teamcode.Subsytem.Intake;
+import org.firstinspires.ftc.teamcode.Subsytem.OpmodeStorage;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(group = "StateTest")
 public class Autonomous extends LinearOpMode {
@@ -95,15 +96,17 @@ public class Autonomous extends LinearOpMode {
 
 
 
-        Trajectory spikeL = drive.trajectoryBuilder(startPose)
+        TrajectorySequence spikeL = drive.trajectorySequenceBuilder(startPose)
                 .lineToConstantHeading(new Vector2d((-47+sideOffset), (-42*allianceFlip)))
+                .lineToConstantHeading(new Vector2d((-24+sideOffset), (-48*allianceFlip)))
                 .build();
         TrajectorySequence spikeC = drive.trajectorySequenceBuilder(startPose)
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (-36*allianceFlip)))
-                .lineToConstantHeading(new Vector2d((-36+sideOffset), (-39*allianceFlip)))
+                .lineToConstantHeading(new Vector2d((-24+sideOffset), (-48*allianceFlip)))
                 .build();
-        Trajectory spikeR = drive.trajectoryBuilder(startPose)
+        TrajectorySequence spikeR = drive.trajectorySequenceBuilder(startPose)
                 .lineToConstantHeading(new Vector2d((-24+sideOffset), (-42*allianceFlip)))
+                .lineToConstantHeading(new Vector2d((-24+sideOffset), (-48*allianceFlip)))
                 .build();
 
 
@@ -111,10 +114,10 @@ public class Autonomous extends LinearOpMode {
         currentState = State.SPIKE;
         switch (spike){
             case SPIKE_LEFT:
-                drive.followTrajectoryAsync(spikeL);
+                drive.followTrajectorySequenceAsync(spikeL);
                 break;
             case SPIKE_RIGHT:
-                drive.followTrajectoryAsync(spikeR);
+                drive.followTrajectorySequenceAsync(spikeR);
                 break;
             case SPIKE_CENTER:
                 drive.followTrajectorySequenceAsync(spikeC);
@@ -212,6 +215,7 @@ public class Autonomous extends LinearOpMode {
                     break;
 
                 case IDLE:
+                    //OpmodeStorage.slidePos = arm.getSlideLenght();
                     break;
             }
 

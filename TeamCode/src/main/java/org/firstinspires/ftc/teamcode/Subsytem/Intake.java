@@ -36,6 +36,9 @@ public class Intake {
 
     double targetIntake = 0;
 
+    boolean toggleManualIntake = true;
+    int manualIntakeOn = 1;
+
     public Intake(HardwareMap hardwareMap){                 // Motor Mapping
         intake = hardwareMap.get(DcMotorEx.class, "intakeM");
         outtake = hardwareMap.get(CRServo.class, "outtakeS");
@@ -162,6 +165,22 @@ public class Intake {
             }
 
             telemetry.addData("intake target", targetIntake);
+        }
+
+        public void toggleEdit(Gamepad gamepad2, Arm arm, Telemetry telemetry){
+            if (gamepad2.left_stick_button && toggleManualIntake){
+                toggleManualIntake = false;
+                manualIntakeOn *= -1;
+            }
+            else if (!gamepad2.left_stick_button){
+                toggleManualIntake = true;
+            }
+
+            if (manualIntakeOn == 1) {
+                updateIntakeAngle(arm, telemetry);
+            }else{
+                manualPivot(gamepad2);
+            }
         }
 
         public double getIntakeTargetPos(){
