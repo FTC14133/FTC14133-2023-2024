@@ -129,7 +129,7 @@ public class Arm {
 
         switch (armSlidePos){
             case -1:
-                armTargetPos = 114;
+                armTargetPos = 93;
                 slideTargetPos = 0;
                 break;
             case 0: // Intake 96
@@ -187,11 +187,11 @@ public class Arm {
 
         if ((!((currentIntake > (targetIntake-5)) && (currentIntake < (targetIntake+5)))) && armSlidePos == 0){
             armPower = 0;
-            telemetry.addData("inside", "arm stopper");
+            //telemetry.addData("inside", "arm stopper");
         }
 
-        telemetry.addData("inside range", !((currentIntake > (targetIntake-5)) && (currentIntake < (targetIntake+5))));
-        telemetry.addData("on arm pos 0", armSlidePos != 0);
+        //telemetry.addData("inside range", !((currentIntake > (targetIntake-5)) && (currentIntake < (targetIntake+5))));
+        //telemetry.addData("on arm pos 0", armSlidePos != 0);
         armL.setPower(armPower);
         armR.setPower(armPower);
 

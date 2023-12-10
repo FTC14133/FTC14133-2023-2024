@@ -111,7 +111,7 @@ public class Intake {
         public double getIntakeAngle(Telemetry telemetry){
             double PNPVoltage = pivotIntakePNP.getVoltage();
 
-            telemetry.addData("intake voltage", (pivotIntakePNP.getVoltage()));
+            //telemetry.addData("intake voltage", (pivotIntakePNP.getVoltage()));
             double currentAngle = (degpervoltage*PNPVoltage);
 /*            if (doneReset){
                 pastAngle = currentAngle;
@@ -142,7 +142,7 @@ public class Intake {
         public void updateIntakeAngle(Arm arm, Telemetry telemetry){
 
             if ((arm.getArmSlidePos() == 0) || (arm.getArmSlidePos() == 4) || (arm.getArmSlidePos() == 5)){
-                telemetry.addData("In Intake", "pickup");
+                //telemetry.addData("In Intake", "pickup");
                 targetIntake = 113;
                 GoToAngle(targetIntake, telemetry);
             }else if (arm.getArmSlidePos() == -1){
@@ -150,8 +150,8 @@ public class Intake {
             }
             else
             {
-                telemetry.addData("In Intake", "backdrop align");
-                targetIntake = 99+arm.getArmAngle();
+                //telemetry.addData("In Intake", "backdrop align");
+                targetIntake = 67+arm.getArmAngle();
                 if (targetIntake < 82){
                     targetIntake = 82;
                 }

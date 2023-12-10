@@ -98,8 +98,9 @@ public class Autonomous extends LinearOpMode {
         Trajectory spikeL = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d((-47+sideOffset), (-42*allianceFlip)))
                 .build();
-        Trajectory spikeC = drive.trajectoryBuilder(startPose)
+        TrajectorySequence spikeC = drive.trajectorySequenceBuilder(startPose)
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (-36*allianceFlip)))
+                .lineToConstantHeading(new Vector2d((-36+sideOffset), (-39*allianceFlip)))
                 .build();
         Trajectory spikeR = drive.trajectoryBuilder(startPose)
                 .lineToConstantHeading(new Vector2d((-24+sideOffset), (-42*allianceFlip)))
@@ -116,7 +117,7 @@ public class Autonomous extends LinearOpMode {
                 drive.followTrajectoryAsync(spikeR);
                 break;
             case SPIKE_CENTER:
-                drive.followTrajectoryAsync(spikeC);
+                drive.followTrajectorySequenceAsync(spikeC);
                 break;
         }
 
@@ -135,7 +136,8 @@ public class Autonomous extends LinearOpMode {
 
                         switch (side){
                             case SIDE_CLOSE:
-                                drive.followTrajectorySequenceAsync(updateStraightTo(drive, allianceFlip, sideOffset));
+                                armSlidePos = 1;
+                                drive.followTrajectorySequenceAsync(updateStraightTo(drive, allianceFlip, sideOffset, side));
                                 break;
                             case SIDE_FAR:
                                 switch (spike){
@@ -143,7 +145,7 @@ public class Autonomous extends LinearOpMode {
                                         drive.followTrajectorySequenceAsync(updatefarLR(drive, allianceFlip));
                                         break;
                                     case SPIKE_CENTER:
-                                        drive.followTrajectorySequenceAsync(updateStraightTo(drive, allianceFlip, sideOffset));
+                                        drive.followTrajectorySequenceAsync(updateStraightTo(drive, allianceFlip, sideOffset, side));
                                         break;
                                 }
                         }
@@ -156,20 +158,25 @@ public class Autonomous extends LinearOpMode {
 
                         double yBack = 0;
                         switch (spike) {
-                            case SPIKE_LEFT:
-                                yBack = -30;
-                                break;
                             case SPIKE_RIGHT:
-                                yBack = -42;
+                                yBack = -40;
+                                break;
+                            case SPIKE_LEFT:
+                                yBack = -29;
                                 break;
                             case SPIKE_CENTER:
-                                yBack = -36;
+                                yBack = -35;
                                 break;
                         }
 
+                        telemetry.addData("yBack without offset", yBack);
+
                         if (alliance.equals(ALLIANCE_BLUE)){
-                            yBack += 72;
+                            yBack += 73;
                         }
+
+                        telemetry.addData("yBack with offset", yBack);
+                        telemetry.update();
 
                         drive.followTrajectoryAsync(updateBackAlign(drive, yBack));
                     }
@@ -190,11 +197,11 @@ public class Autonomous extends LinearOpMode {
                     break;
 
                 case PLACE:
-                    if (intakeTimer.seconds() >= 2.0){
+                    if (intakeTimer.seconds() >= 5.0){
                         outtakeState = 0;
 
                         currentState = State.PARK;
-                        drive.followTrajectoryAsync(updatePark(drive, allianceFlip));
+                        drive.followTrajectorySequenceAsync(updatePark(drive, allianceFlip));
                     }
                     break;
 
@@ -219,21 +226,26 @@ public class Autonomous extends LinearOpMode {
 
     }
 
-    public TrajectorySequence updateStraightTo(SampleMecanumDrive drive, int allianceFlip, double sideOffset){
+    public TrajectorySequence updateStraightTo(SampleMecanumDrive drive, int allianceFlip, double sideOffset, String side){
 
-        telemetry.addData("poseEstimate", drive.getPoseEstimate());
-        telemetry.update();
+        //telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        //telemetry.update();
 
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d((-36+sideOffset), (-39*allianceFlip)))
+
+                .addSpatialMarker(new Vector2d(0, -35*(allianceFlip)), () -> {
+                    if (side.equals(SIDE_FAR)){
+                        armSlidePos = 1;
+                    }
+                })
                 .lineToConstantHeading(new Vector2d(40, (-36*allianceFlip)))
                 .build();
     }
 
     public TrajectorySequence updatefarLR(SampleMecanumDrive drive, int allianceFlip){
 
-        telemetry.addData("poseEstimate", drive.getPoseEstimate());
-        telemetry.update();
+        //telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        //telemetry.update();
 
         return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
 
@@ -250,21 +262,22 @@ public class Autonomous extends LinearOpMode {
 
     public Trajectory updateBackAlign(SampleMecanumDrive drive, double yValue){
 
-        telemetry.addData("poseEstimate", drive.getPoseEstimate());
-        telemetry.update();
+        //telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        //telemetry.update();
 
         return drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(40, yValue))
+                .lineToConstantHeading(new Vector2d(54, yValue))
                 .build();
     }
 
-    public Trajectory updatePark(SampleMecanumDrive drive, int allianceFlip){
+    public TrajectorySequence updatePark(SampleMecanumDrive drive, int allianceFlip){
 
-        telemetry.addData("poseEstimate", drive.getPoseEstimate());
-        telemetry.update();
+        //telemetry.addData("poseEstimate", drive.getPoseEstimate());
+        //telemetry.update();
 
-        return drive.trajectoryBuilder(drive.getPoseEstimate())
-                .splineToConstantHeading(new Vector2d(59, (-64*allianceFlip)), Math.toRadians(0))
+        return drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .back(10)
+                .lineToConstantHeading(new Vector2d(45, (-60*allianceFlip)))
                 .build();
     }
 
