@@ -296,6 +296,7 @@ public class Autonomous extends LinearOpMode {
 
         while (!opModeIsActive() && !isStopRequested()){
 
+            teamElementDetection.setAlliance(alliance);
             int element_zone = teamElementDetection.elementDetection(telemetry);
             telemetry.addData("getMaxDistance", teamElementDetection.getMaxDistance());
 
@@ -309,16 +310,13 @@ public class Autonomous extends LinearOpMode {
             telemetry.addData("Current Alliance Selected : ", alliance.toUpperCase());
             telemetry.addData("", "");
 
-            if (gamepad1.dpad_left){
+            if (element_zone == 1){
                 spike = SPIKE_LEFT;
-            }else if (gamepad1.dpad_right){
+            }else if (element_zone == 3){
                 spike = SPIKE_RIGHT;
-            }else if (gamepad1.dpad_up){
+            }else{
                 spike = SPIKE_CENTER;
             }
-            telemetry.addData("Select Spike Mark (Gamepad1 D-PAD Left = Left Spike, Gamepad1 D-PAD Up = Center Spike, Gamepad1 D-PAD Right = Right Spike)", "");
-            telemetry.addData("Current Spike Mark Selected : ", spike.toUpperCase());
-            telemetry.addData("", "");
 
             if (gamepad1.y){
                 side = SIDE_FAR;
