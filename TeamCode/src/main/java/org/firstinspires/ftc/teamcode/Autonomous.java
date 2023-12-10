@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.Subsystems.TeamElementDetection.TeamElementSubsystem;
 import org.firstinspires.ftc.teamcode.Subsytem.Arm;
 import org.firstinspires.ftc.teamcode.Subsytem.Intake;
 import org.firstinspires.ftc.teamcode.Subsytem.OpmodeStorage;
@@ -42,6 +43,7 @@ public class Autonomous extends LinearOpMode {
 
     private Arm arm=null;
     private Intake intake=null;
+    private TeamElementSubsystem teamElementDetection=null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -50,6 +52,7 @@ public class Autonomous extends LinearOpMode {
 
         arm = new Arm(hardwareMap);
         intake = new Intake(hardwareMap);
+        teamElementDetection = new TeamElementSubsystem(hardwareMap);
 
         String[] selectedArray = autoSelector();
 
@@ -292,6 +295,11 @@ public class Autonomous extends LinearOpMode {
         String side = SIDE_CLOSE;
 
         while (!opModeIsActive() && !isStopRequested()){
+
+            int element_zone = teamElementDetection.elementDetection(telemetry);
+            telemetry.addData("getMaxDistance", teamElementDetection.getMaxDistance());
+
+
             if (gamepad1.x){
                 alliance = ALLIANCE_BLUE;
             }else if (gamepad1.b){
