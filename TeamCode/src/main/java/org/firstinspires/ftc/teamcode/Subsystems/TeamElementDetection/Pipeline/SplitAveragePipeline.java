@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems.TeamElementDetection.Pipeline;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -21,12 +22,6 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
     int toggleShow = 1;
 
-    //public SplitAveragePipeline(/*Telemetry telemetry, */int iCAMERA_HEIGHT, int iCAMERA_WIDTH){
-    //    //this.telemetry = telemetry;
-    //    this.CAMERA_HEIGHT = iCAMERA_HEIGHT;
-    //    this.CAMERA_WIDTH = iCAMERA_WIDTH;
-    //}
-
     Mat original;
 
     Mat zone1;
@@ -41,6 +36,9 @@ public class SplitAveragePipeline extends OpenCvPipeline {
     double distance2 = 1;
     double distance3 = 0;
 
+    double max_distance = 0;
+
+
     @Override
     public Mat processFrame(Mat input) {
 
@@ -51,9 +49,9 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
         //Defining Zones
         //Rect(top left x, top left y, bottom right x, bottom right y)
-        zone1 = input.submat(new Rect(0, 180, 115, 115));
-        zone2 = input.submat(new Rect(316, 180, 115, 115));
-        zone3 = input.submat(new Rect(660, 180, 115, 115));
+        zone1 = input.submat(new Rect(0, 161, 190, 169));
+        zone2 = input.submat(new Rect(441, 175, 144, 144));
+        zone3 = input.submat(new Rect(784, 161, 13, 141));
 
         //Averaging the colors in the zones
         avgColor1 = Core.mean(zone1);
@@ -69,7 +67,7 @@ public class SplitAveragePipeline extends OpenCvPipeline {
         double distance2 = color_distance(avgColor2, ELEMENT_COLOR);
         double distance3 = color_distance(avgColor3, ELEMENT_COLOR);
 
-        double max_distance = Math.min(distance3, Math.min(distance1, distance2));
+        max_distance = Math.min(distance3, Math.min(distance1, distance2));
 
         if (max_distance == distance1){
             //telemetry.addData("Zone 1 Has Element", distance1);
@@ -113,6 +111,10 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
     public int get_element_zone(){
         return color_zone;
+    }
+
+    public double getMaxDistance(){
+        return max_distance;
     }
 
     public void toggleAverageZonePipe(){

@@ -52,5 +52,9 @@ public class TeamElementSubsystem {
     public void toggleAverageZone(){
         splitAveragePipeline.toggleAverageZonePipe();
     }
+
+    public double getMaxDistance(){
+        return splitAveragePipeline.getMaxDistance();
+    }
 }
 

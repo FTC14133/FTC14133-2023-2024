@@ -35,6 +35,8 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
         while (!opModeIsActive() && !isStopRequested()){
             element_zone = teamElementDetection.elementDetection(telemetry);
+            telemetry.addData("getMaxDistance", teamElementDetection.getMaxDistance());
+
             if (togglePreview && gamepad2.a){
                 togglePreview = false;
                 teamElementDetection.toggleAverageZone();
