@@ -135,7 +135,7 @@ public class Autonomous extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             switch (currentState){
                 case SPIKE:
-                    if (!drive.isBusy()){
+                    if (!drive.isBusy()){ // Done with spike movement
                         currentState = State.BACKDROP;
 
                         //armSlidePos = 1;
