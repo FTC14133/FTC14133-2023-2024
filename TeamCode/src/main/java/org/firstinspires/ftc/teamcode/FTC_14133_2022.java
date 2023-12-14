@@ -38,8 +38,6 @@ public class  FTC_14133_2022 extends OpMode {
  public void init_loop() {
      telemetry.addData("Status", "Init Loop");
      telemetry.update();
-
-     arm.homeSlides();
  }
 
  public void loop() {

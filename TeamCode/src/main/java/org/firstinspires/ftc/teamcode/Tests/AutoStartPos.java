@@ -1,49 +1,26 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Subsytem.Arm;
 import org.firstinspires.ftc.teamcode.Subsytem.Intake;
 
-@TeleOp(name="AutoStartPos", group="Iterative Opmode") // Labels program in Driver station Selection
+@Autonomous(name="AutoStartPos", group="Util")
 
-public class AutoStartPos extends OpMode {
+public class AutoStartPos extends LinearOpMode {
 
     private Arm arm=null;
     private Intake intake=null;
 
-
-    public void init() {
-
+    @Override
+    public void runOpMode() throws InterruptedException {
         arm = new Arm(hardwareMap);
-
         intake = new Intake(hardwareMap);
 
+        while (!arm.getSlideLimitState()){
+            arm.homeSlides();
+        }
     }
 
-    public void start() {
-        telemetry.addData("Status", "Start");
-        telemetry.update();
-    }
-
-
-    public void loop() {
-        telemetry.addData("Status", "Looping");
-
-        telemetry.addData("getArmSlidePos", arm.getArmAngle());
-        telemetry.addData("getSlideLenght", arm.getSlideLenght());
-        telemetry.addData("getIntakeAngle", intake.objpivot.getIntakeAngle(telemetry));
-
-        arm.homeSlides();
-        arm.GoToPosition(-1, intake, telemetry);
-        intake.objpivot.GoToAngle(83,telemetry);
-
-        telemetry.update();
-
-    }
-
-    public void stop(){
-
-    }
 }

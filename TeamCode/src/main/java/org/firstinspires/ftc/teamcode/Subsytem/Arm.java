@@ -24,13 +24,11 @@ public class Arm {
     private PIDFController armController;
     public static double armP = 0.1, armI = 0, armD = 0.00001, armFF = -0.001;
 
-    boolean toggleArm = true;
+/*    boolean toggleArm = true;
+    int armMax = 5;
+    int armMin = 0;*/
 
     int armSlidePos = 0;
-    String clicklast = "b";
-
-    int armMax = 5;
-    int armMin = 0;
 
     double armTargetPos = 0;
     double slideTargetPos = 0;
@@ -48,8 +46,6 @@ public class Arm {
         slideM = hardwareMap.get(DcMotorEx.class, "slideM");
         slideM.setDirection(DcMotorSimple.Direction.REVERSE);
         slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
 
         armL = hardwareMap.get(DcMotorEx.class, "armLM");
         armR = hardwareMap.get(DcMotorEx.class, "armRM");
@@ -65,7 +61,7 @@ public class Arm {
     }
 
     public void Teleop(Gamepad gamepad2, Telemetry telemetry, Intake intake){
-        if (toggleArm && (gamepad2.dpad_up || gamepad2.dpad_down)) {  // Only execute once per Button push
+/*        if (toggleArm && (gamepad2.dpad_up || gamepad2.dpad_down)) {  // Only execute once per Button push
             toggleArm = false;  // Prevents this section of code from being called again until the Button is released and re-pressed
             if (gamepad2.dpad_down) {  // If the d-pad up button is pressed
                 armSlidePos = armSlidePos - 1; //Increase Arm position
@@ -82,21 +78,23 @@ public class Arm {
         }
         else if (!gamepad2.dpad_up && !gamepad2.dpad_down) { //if neither button is being pressed
             toggleArm = true; // Button has been released, so this allows a re-press to activate the code above.
-        }
+        }*/
 
 
-        if (gamepad2.b){
+        if (gamepad2.b){ // Pickup Pos
             armSlidePos = 0;
-            clicklast = "b";
-        }else if (gamepad2.a){
+        }else if (gamepad2.a){ // Low Place Pos
             armSlidePos = 1;
-            clicklast = "a";
-        }else if (gamepad2.x){
+        }else if (gamepad2.x){ // Medium Place Pos
             armSlidePos = 2;
-            clicklast = "x";
-        }else if (gamepad2.y){
+        }else if (gamepad2.y){ // High Place Pos
             armSlidePos = 3;
-            clicklast = "y";
+        }else if (gamepad2.dpad_right){ // Truss Travel Pos
+            armSlidePos = -2;
+        }else if (gamepad2.dpad_up){ // Climb Up Pos
+            armSlidePos = 4;
+        }else if (gamepad2.dpad_down){ // Climb Down Pos
+            armSlidePos = 5;
         }
 
 
@@ -108,6 +106,14 @@ public class Arm {
         armSlidePos = position; // to update in auto, redundant in teleop
 
         switch (armSlidePos){
+            case -3:
+                armTargetPos = 70;
+                slideTargetPos = 17939;
+                break;
+            case -2:
+                armTargetPos = 93;
+                slideTargetPos = 7.5*slideCountsPerInch;
+                break;
             case -1:
                 armTargetPos = 93;
                 slideTargetPos = 0;
@@ -177,6 +183,17 @@ public class Arm {
 
     }
 
+    public void setArmPos(int tarPos){
+        double armPower = (armController.calculate(getArmAngle(), tarPos));
+
+        armL.setPower(armPower);
+        armR.setPower(armPower);
+    }
+
+    public boolean getSlideLimitState(){
+        return slideLimit.isPressed();
+    }
+
     public void homeSlides(){
         if (slideLimit.isPressed()){
             slideM.setPower(0);
@@ -195,6 +212,10 @@ public class Arm {
         slideM.setPower(0);
         slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
+    }
+
+    public void resetSlideEncoder(){
+        slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public double getArmAngle(){
