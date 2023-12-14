@@ -30,7 +30,10 @@ public class Intake {
 
     double intakeOffset = 0;
 
-    double  intakeTargetPos = 0; // todo: see what starting pos we want
+    double intakeTargetPos = 0; // todo: see what starting pos we want
+
+    boolean toggleIntake = true;
+
     public Catcher objcatcher;
     public Pivot objpivot;
 
@@ -73,20 +76,23 @@ public class Intake {
             int intakeState = 0;
             int outtakeState = 0;
 
-            if (gamepad1.y){ //Intake
+
+            if (toggleIntake && gamepad1.y) {  // Only execute once per Button push
+                toggleIntake = false;  // Prevents this section of code from being called again until the Button is released and re-pressed
+            } else if (!gamepad1.y) { //if neither button is being pressed
+                toggleIntake = true; // Button has been released, so this allows a re-press to activate the code above.
+            }
+
+            if (!toggleIntake){ //Intake
                 intakeState = 1;
             }else if (gamepad1.b){ //Reverse Intake
                 intakeState = -1;
-            }else{
-                intakeState = 0;
             }
 
             if (gamepad1.x){ //Outtake
                 outtakeState = 1;
             }else if (gamepad1.a){ //Reverse Outtake
                 outtakeState = -1;
-            }else{
-                outtakeState = 0;
             }
 
             runIntake(intakeState);
