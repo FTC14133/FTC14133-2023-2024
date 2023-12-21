@@ -107,15 +107,15 @@ public class Arm {
 
         switch (armSlidePos){
             case -3:
-                armTargetPos = 70;
-                slideTargetPos = 17939;
+                armTargetPos = 71; //auto place
+                slideTargetPos = 18843;
                 break;
             case -2:
                 armTargetPos = 93;
                 slideTargetPos = 7.5*slideCountsPerInch;
                 break;
             case -1:
-                armTargetPos = 93;
+                armTargetPos = 93; //auto truss
                 slideTargetPos = 0;
                 break;
             case 0: // Intake 96
