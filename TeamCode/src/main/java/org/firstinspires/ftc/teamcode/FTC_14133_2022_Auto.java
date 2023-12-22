@@ -7,18 +7,19 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Subsystems.AprilTagDetection;
+import org.firstinspires.ftc.teamcode.Subsystems.GetPos;
 
 @Autonomous(name="FTC_14133_2022_Auto", group="Auto")
 
 public class  FTC_14133_2022_Auto extends LinearOpMode{
 
-    private AprilTagDetection aprilTagDetection=null;
+    private GetPos getPos=null;
 
-    public void HardwareStart() throws InterruptedException {
+    public void HardwareStart() {
         telemetry.addData("Object Creation", "Start");
         telemetry.update();
 
-        aprilTagDetection = new AprilTagDetection(hardwareMap);
+        getPos = new GetPos(hardwareMap);
 
         telemetry.addData("Object Creation", "Done");
         telemetry.update();
@@ -26,15 +27,17 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
 
 
 
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode(){
 
         HardwareStart();
 
-        waitForStart();
+        while (!opModeIsActive() && !isStopRequested()){
+            getPos.returnAprilPos(telemetry);
+            telemetry.addData("e", "e");
+            telemetry.update();
+        }
 
         telemetry.addData("Object", "Passed waitForStart");
-
-        aprilTagDetection.goToTag(telemetry, 4);
 
         telemetry.update();
 

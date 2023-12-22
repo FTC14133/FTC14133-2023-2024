@@ -19,11 +19,10 @@ import java.util.concurrent.TimeUnit;
 
 public class GetPos {
 
-    private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
 
-    public void AprilTagDetection(HardwareMap hardwareMap) {
+    public GetPos(HardwareMap hardwareMap) {
         initAprilTag(hardwareMap);
         //setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
     }
@@ -32,6 +31,7 @@ public class GetPos {
 
         org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag;
         desiredTag = getDetections(1);
+        telemetry.addData("desiredTag", desiredTag);
 
         if (!(desiredTag == null)) {
             telemetry.addData("Target", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
@@ -42,7 +42,6 @@ public class GetPos {
             telemetry.addData("", "");
             telemetry.addData("Distance from Backdrop", (Math.cos(desiredTag.ftcPose.bearing) * desiredTag.ftcPose.range));
             telemetry.addData("Offset Sideways by", (Math.sin(desiredTag.ftcPose.bearing) * desiredTag.ftcPose.range));
-            telemetry.update();
         }
 
     }
@@ -52,14 +51,17 @@ public class GetPos {
         org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag = null;
 
         List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : currentDetections) {
-            if ((detection.metadata != null) &&
-                    ((desiredTagID < 0) || (detection.id == desiredTagID))) {
-                desiredTag = detection;
-                break;
+        if (currentDetections != null) {
+            for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : currentDetections) {
+                if ((detection.metadata != null) &&
+                        ((desiredTagID < 0) || (detection.id == desiredTagID))) {
+                    desiredTag = detection;
+                    break;
+                }
             }
+            return desiredTag;
         }
-        return desiredTag;
+        return null;
     }
 
     /**
@@ -70,16 +72,9 @@ public class GetPos {
         aprilTag = new AprilTagProcessor.Builder().build();
 
         // Create the vision portal by using a builder.
-        if (USE_WEBCAM) {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                    .addProcessor(aprilTag)
-                    .build();
-        } else {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(BuiltinCameraDirection.BACK)
-                    .addProcessor(aprilTag)
-                    .build();
-        }
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 2"))
+                .addProcessor(aprilTag)
+                .build();
     }
 }
