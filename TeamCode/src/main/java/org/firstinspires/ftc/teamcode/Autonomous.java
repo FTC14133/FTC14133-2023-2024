@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.Subsystems.TeamElementDetection.TeamElementSubsystem;
 import org.firstinspires.ftc.teamcode.Subsytem.Arm;
 import org.firstinspires.ftc.teamcode.Subsytem.Intake;
-import org.firstinspires.ftc.teamcode.Subsytem.OpmodeStorage;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(group = "StateTest")
 public class Autonomous extends LinearOpMode {

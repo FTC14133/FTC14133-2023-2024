@@ -33,8 +33,6 @@ public class Arm {
     double armTargetPos = 0;
     double slideTargetPos = 0;
 
-    double slideStartPos = OpmodeStorage.slidePos;
-
     final double degpervoltage = 270/3.3;
 
     double slidePower = 1;
@@ -147,8 +145,6 @@ public class Arm {
         }
 
         if (armSlidePos != -1) {
-
-            slideTargetPos -= slideStartPos;
 
             slidePower = 1;
             if (slideLimit.isPressed()) {
