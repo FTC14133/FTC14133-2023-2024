@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.TeamElementDetection.Pipeline.S
 public class TeamElementSubsystem {
     OpenCvCamera camera;
     SplitAveragePipeline splitAveragePipeline;
-    int camW = 800;
-    int camH = 448;
+    int camW = 1280;
+    int camH = 720;
 
     int zone = 1;
 

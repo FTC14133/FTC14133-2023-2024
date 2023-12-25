@@ -26,15 +26,12 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
     Mat zone1;
     Mat zone2;
-    Mat zone3;
 
     Scalar avgColor1;
     Scalar avgColor2;
-    Scalar avgColor3;
 
     double distance1 = 1;
     double distance2 = 1;
-    double distance3 = 0;
 
     double max_distance = 0;
 
@@ -49,36 +46,34 @@ public class SplitAveragePipeline extends OpenCvPipeline {
 
         //Defining Zones
         //Rect(top left x, top left y, bottom right x, bottom right y)
-        zone1 = input.submat(new Rect(0, 161, 190, 169));
-        zone2 = input.submat(new Rect(441, 175, 144, 144));
-        zone3 = input.submat(new Rect(784, 161, 13, 141));
+        zone1 = input.submat(new Rect(60, 170, 356, 285));
+        zone2 = input.submat(new Rect(735, 170, 253, 230));
 
         //Averaging the colors in the zones
         avgColor1 = Core.mean(zone1);
         avgColor2 = Core.mean(zone2);
-        avgColor3 = Core.mean(zone3);
 
         //Putting averaged colors on zones (we can see on camera now)
         zone1.setTo(avgColor1);
         zone2.setTo(avgColor2);
-        zone3.setTo(avgColor3);
 
-        double distance1 = color_distance(avgColor1, ELEMENT_COLOR);
-        double distance2 = color_distance(avgColor2, ELEMENT_COLOR);
-        double distance3 = color_distance(avgColor3, ELEMENT_COLOR);
+        distance1 = color_distance(avgColor1, ELEMENT_COLOR);
+        distance2 = color_distance(avgColor2, ELEMENT_COLOR);
 
-        max_distance = Math.min(distance3, Math.min(distance1, distance2));
-
-        if (max_distance == distance1){
-            //telemetry.addData("Zone 1 Has Element", distance1);
-            color_zone = 1;
-
-        }else if (max_distance == distance2){
-            //telemetry.addData("Zone 2 Has Element", distance2);
-            color_zone = 2;
-        }else{
-            //telemetry.addData("Zone 2 Has Element", distance3);
+        if ((distance1 > 195) && (distance2 > 190)){
             color_zone = 3;
+            max_distance = -1;
+        }else{
+            max_distance = Math.min(distance1, distance2);
+
+            if (max_distance == distance1) {
+                //telemetry.addData("Zone 1 Has Element", distance1);
+                color_zone = 1;
+
+            }else{
+                //telemetry.addData("Zone 2 Has Element", distance2);
+                color_zone = 2;
+            }
         }
 
         // Allowing for the showing of the averages on the stream
