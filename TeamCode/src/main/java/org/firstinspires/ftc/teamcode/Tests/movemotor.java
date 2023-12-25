@@ -8,9 +8,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.Subsytem.Arm;
-import org.firstinspires.ftc.teamcode.Subsytem.Intake;
-
 @TeleOp(name="movemotor", group="Iterative Opmode") // Labels program in Driver station Selection
 
 public class movemotor extends OpMode {

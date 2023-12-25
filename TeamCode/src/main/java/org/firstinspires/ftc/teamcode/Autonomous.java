@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Subsystems.TeamElementDetection.TeamElementSubsystem;
-import org.firstinspires.ftc.teamcode.Subsytem.Arm;
-import org.firstinspires.ftc.teamcode.Subsytem.Intake;
+import org.firstinspires.ftc.teamcode.Subsystems.Arm;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(group = "StateTest")
 public class Autonomous extends LinearOpMode {
