@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
  * This opmode is essentially just LocalizationTest.java with a few additions and comments.
  */
 @TeleOp(group = "advanced")
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 public class RunDrive extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

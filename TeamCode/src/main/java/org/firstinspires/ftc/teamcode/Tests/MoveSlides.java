@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp(name="MoveSlides", group="Iterative Opmode") // Labels program in Driver station Selection
-
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 public class MoveSlides extends OpMode {
 
     static DcMotorEx slide;

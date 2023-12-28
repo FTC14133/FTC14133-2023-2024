@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 @TeleOp(name="LimitSwitch", group="Iterative Opmode") // Labels program in Driver station Selection
-
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 public class LimitSwitch extends OpMode {
     DigitalChannel slideLimit;
 
