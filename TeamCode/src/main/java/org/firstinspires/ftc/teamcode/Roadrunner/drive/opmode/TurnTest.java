@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
  * This is a simple routine to test turning capabilities.
  */
 @Config
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 @Autonomous(group = "drive")
 public class TurnTest extends LinearOpMode {
     public static double ANGLE = 90; // deg

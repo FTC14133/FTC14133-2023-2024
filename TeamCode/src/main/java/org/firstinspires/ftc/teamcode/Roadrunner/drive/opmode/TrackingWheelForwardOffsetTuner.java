@@ -35,6 +35,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.StandardTrackingWheelLoca
  * satisfactory result is produced.
  */
 @Config
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 @Autonomous(group="drive")
 public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
     public static double ANGLE = 180; // deg

@@ -24,6 +24,7 @@ import java.util.Objects;
  * <p>
  * Further fine tuning of kF may be desired.
  */
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 @Config
 @Autonomous(group = "drive")
 public class MaxVelocityTuner extends LinearOpMode {

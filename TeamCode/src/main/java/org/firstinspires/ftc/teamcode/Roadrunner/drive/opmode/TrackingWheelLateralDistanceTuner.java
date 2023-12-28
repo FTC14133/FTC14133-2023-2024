@@ -62,6 +62,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.StandardTrackingWheelLoca
  * precision. The heading should still line up.
  */
 @Config
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 @TeleOp(group = "drive")
 public class TrackingWheelLateralDistanceTuner extends LinearOpMode {
     public static int NUM_TURNS = 10;

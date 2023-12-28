@@ -23,6 +23,7 @@ import java.util.Objects;
  */
 
 @Config
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 @Autonomous(group = "drive")
 public class MaxAngularVeloTuner extends LinearOpMode {
     public static double RUNTIME = 4.0;

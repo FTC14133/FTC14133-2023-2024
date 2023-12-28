@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
 @TeleOp(group = "drive")
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 public class LocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

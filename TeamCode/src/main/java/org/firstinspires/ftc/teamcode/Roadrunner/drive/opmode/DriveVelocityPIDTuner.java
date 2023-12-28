@@ -50,6 +50,7 @@ import java.util.List;
  */
 @Config
 @Autonomous(group = "drive")
+@com.qualcomm.robotcore.eventloop.opmode.Disabled
 public class DriveVelocityPIDTuner extends LinearOpMode {
     public static double DISTANCE = 72; // in
 
