@@ -32,8 +32,7 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
         HardwareStart();
 
         while (!opModeIsActive() && !isStopRequested()){
-            getPos.returnAprilPos(telemetry, 4);
-            telemetry.addData("e", "e");
+            getPos.returnAprilPos(telemetry);
         }
 
         telemetry.addData("Object", "Passed waitForStart");
