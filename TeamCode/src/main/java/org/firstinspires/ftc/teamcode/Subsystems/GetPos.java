@@ -29,12 +29,16 @@
 
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
@@ -65,7 +69,7 @@ public class GetPos{
         //setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
     }
 
-    public void returnAprilPos(Telemetry telemetry) {
+    public void returnAprilPos(Telemetry telemetry, SampleMecanumDrive drive, Gamepad gamepad1) {
         boolean targetFound = false;    // Set to true when an AprilTag target is detected
 
         ElapsedTime time = new ElapsedTime();
@@ -143,6 +147,9 @@ public class GetPos{
 
                     telemetry.addData("\nxRobotCenterPos", robotCenterPos[0]);
                     telemetry.addData("yRobotCenterPos", robotCenterPos[1]);
+
+                    drive.setPoseEstimate(new Pose2d(robotCenterPos[0], robotCenterPos[1], yaw));
+                    drive.update();
 
                 }
                 telemetry.update();
