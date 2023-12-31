@@ -30,9 +30,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -68,7 +66,7 @@ public class AprilTagDetection {
         //setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
     }
 
-    public void returnAprilPos(Telemetry telemetry, SampleMecanumDrive drive) {
+    public void calcAprilPos(Telemetry telemetry, SampleMecanumDrive drive) {
         org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag = null;
 
         desiredTag = getDetections();

@@ -303,6 +303,8 @@ public class Autonomous extends LinearOpMode {
             intake.objcatcher.runOutake(outtakeState);
             intake.objcatcher.runIntake(intakeState);
 
+            aprilTagDetection.calcAprilPos(telemetry, drive);
+
             telemetry.addData("spike.equals(SPIKE_RIGHT)", spike.equals(SPIKE_RIGHT));
             telemetry.addData("spike.equals(SPIKE_RIGHT)", spike);
             telemetry.addData("side.equals(SIDE_CLOSE)", side.equals(SIDE_CLOSE));
