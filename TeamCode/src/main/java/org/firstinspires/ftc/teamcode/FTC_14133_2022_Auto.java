@@ -39,6 +39,9 @@ public class  FTC_14133_2022_Auto extends LinearOpMode{
         while (!opModeIsActive() && !isStopRequested()){
 
             getPos.returnAprilPos(telemetry, drive, gamepad1);
+
+
+            telemetry.update();
         }
 
         telemetry.addData("Object", "Passed waitForStart");
