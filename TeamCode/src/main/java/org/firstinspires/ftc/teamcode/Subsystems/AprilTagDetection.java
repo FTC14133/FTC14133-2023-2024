@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -45,7 +44,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.HashMap;
 import java.util.List;
 
-public class GetPos{
+public class AprilTagDetection {
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
@@ -56,7 +55,7 @@ public class GetPos{
     final int ROBOT_HEIGHT = 18;
 
 
-    public GetPos(HardwareMap hardwareMap){
+    public AprilTagDetection(HardwareMap hardwareMap){
 
         aprilTagPosit.put(1, new double[]{61, 42});
         aprilTagPosit.put(2, new double[]{61, 35});

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.Subsystems.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.Subsystems.TeamElementDetection.TeamElementSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
@@ -46,6 +47,7 @@ public class Autonomous extends LinearOpMode {
     private Arm arm=null;
     private Intake intake=null;
     private TeamElementSubsystem teamElementDetection=null;
+    private AprilTagDetection aprilTagDetection=null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -55,6 +57,7 @@ public class Autonomous extends LinearOpMode {
         arm = new Arm(hardwareMap);
         intake = new Intake(hardwareMap);
         teamElementDetection = new TeamElementSubsystem(hardwareMap);
+        aprilTagDetection = new AprilTagDetection(hardwareMap);
 
         arm.resetSlideEncoder();
 
