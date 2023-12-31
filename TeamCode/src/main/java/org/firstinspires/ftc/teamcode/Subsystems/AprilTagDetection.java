@@ -68,91 +68,70 @@ public class AprilTagDetection {
         //setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
     }
 
-    public void returnAprilPos(Telemetry telemetry, SampleMecanumDrive drive, Gamepad gamepad1) {
-        boolean targetFound = false;    // Set to true when an AprilTag target is detected
-
-        ElapsedTime time = new ElapsedTime();
-
+    public void returnAprilPos(Telemetry telemetry, SampleMecanumDrive drive) {
         org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag = null;
 
-        while (time.seconds() <= 3) {
-            desiredTag = getDetections();
-        }
+        desiredTag = getDetections();
+
         if (desiredTag == null){
-            targetFound = false;
-        }else{
-            targetFound = true;
+            return;
         }
 
-        if (targetFound) {
+        telemetry.addData("Target", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
+        telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
+        telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
+        telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
 
-            while (true) {
-
-                desiredTag = getDetections();
-
-                if (desiredTag == null){
-                    break;
-                }
-
-                telemetry.addData("Target", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-                telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
-                telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
-                telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
-
-                telemetry.addData("", "");
-                telemetry.addData("Distance from Backdrop", (Math.cos(desiredTag.ftcPose.bearing) * desiredTag.ftcPose.range));
-                telemetry.addData("Offset Sideways by", (Math.sin(desiredTag.ftcPose.bearing) * desiredTag.ftcPose.range));
+        telemetry.addData("", "");
+        telemetry.addData("Distance from Backdrop", (Math.cos(desiredTag.ftcPose.bearing) * desiredTag.ftcPose.range));
+        telemetry.addData("Offset Sideways by", (Math.sin(desiredTag.ftcPose.bearing) * desiredTag.ftcPose.range));
 
 
-                if (aprilTagPosit.containsKey(desiredTag.id)){
+        if (aprilTagPosit.containsKey(desiredTag.id)){
 
-                    double bearing = Math.toRadians(desiredTag.ftcPose.bearing);
-                    double yaw = Math.toRadians(desiredTag.ftcPose.yaw);
+            double bearing = Math.toRadians(desiredTag.ftcPose.bearing);
+            double yaw = Math.toRadians(desiredTag.ftcPose.yaw);
 
 
-                    double[] aprilTagPos = aprilTagPosit.get(desiredTag.id);
+            double[] aprilTagPos = aprilTagPosit.get(desiredTag.id);
 
-                    double xBackDist = Math.cos(bearing) * desiredTag.ftcPose.range;
-                    double yBackDist = Math.sin(bearing) * desiredTag.ftcPose.range;
-                    double[] cameraPos = new double[]{aprilTagPos[0] - xBackDist, aprilTagPos[1] - yBackDist};
+            double xBackDist = Math.cos(bearing) * desiredTag.ftcPose.range;
+            double yBackDist = Math.sin(bearing) * desiredTag.ftcPose.range;
+            double[] cameraPos = new double[]{aprilTagPos[0] - xBackDist, aprilTagPos[1] - yBackDist};
 
-                    double xRobotTRDist = Math.sin(yaw) * ROBOT_WIDTH;
-                    double yRobotTRDist = Math.cos(yaw) * ROBOT_WIDTH;
-                    double[] robotTRPos = new double[]{cameraPos[0] - xRobotTRDist, cameraPos[1] - yRobotTRDist};
+            double xRobotTRDist = Math.sin(yaw) * ROBOT_WIDTH;
+            double yRobotTRDist = Math.cos(yaw) * ROBOT_WIDTH;
+            double[] robotTRPos = new double[]{cameraPos[0] - xRobotTRDist, cameraPos[1] - yRobotTRDist};
 
-                    double xRobotBRDist = Math.cos(yaw) * ROBOT_HEIGHT;
-                    double yRobotBRDist = Math.sin(yaw) * ROBOT_HEIGHT;
-                    double[] robotBRPos = new double[]{robotTRPos[0] - xRobotBRDist, robotTRPos[1] - yRobotBRDist};
+            double xRobotBRDist = Math.cos(yaw) * ROBOT_HEIGHT;
+            double yRobotBRDist = Math.sin(yaw) * ROBOT_HEIGHT;
+            double[] robotBRPos = new double[]{robotTRPos[0] - xRobotBRDist, robotTRPos[1] - yRobotBRDist};
 
-                    double[] robotCenterPos = new double[]{(cameraPos[0] + robotBRPos[0])/2, (cameraPos[1] + robotBRPos[1])/2};
+            double[] robotCenterPos = new double[]{(cameraPos[0] + robotBRPos[0])/2, (cameraPos[1] + robotBRPos[1])/2};
 
-                    telemetry.addData("\nXAprilTagPos", aprilTagPos[0]);
-                    telemetry.addData("YAprilTagPos", aprilTagPos[1]);
+            telemetry.addData("\nXAprilTagPos", aprilTagPos[0]);
+            telemetry.addData("YAprilTagPos", aprilTagPos[1]);
 
-                    telemetry.addData("\nxBackDist", xBackDist);
-                    telemetry.addData("yBackDist", yBackDist);
-                    telemetry.addData("xCameraPos", cameraPos[0]);
-                    telemetry.addData("yCameraPos", cameraPos[1]);
+            telemetry.addData("\nxBackDist", xBackDist);
+            telemetry.addData("yBackDist", yBackDist);
+            telemetry.addData("xCameraPos", cameraPos[0]);
+            telemetry.addData("yCameraPos", cameraPos[1]);
 
-                    telemetry.addData("\nxRobotTRDist", xRobotTRDist);
-                    telemetry.addData("yRobotTRDist", yRobotTRDist);
-                    telemetry.addData("xRobotTRPos", robotTRPos[0]);
-                    telemetry.addData("yRobotTRPos", robotTRPos[1]);
+            telemetry.addData("\nxRobotTRDist", xRobotTRDist);
+            telemetry.addData("yRobotTRDist", yRobotTRDist);
+            telemetry.addData("xRobotTRPos", robotTRPos[0]);
+            telemetry.addData("yRobotTRPos", robotTRPos[1]);
 
-                    telemetry.addData("\nxRobotBRDist", xRobotBRDist);
-                    telemetry.addData("yRobotBRDist", yRobotBRDist);
-                    telemetry.addData("xRobotBRPos", robotBRPos[0]);
-                    telemetry.addData("yRobotBRPos", robotBRPos[1]);
+            telemetry.addData("\nxRobotBRDist", xRobotBRDist);
+            telemetry.addData("yRobotBRDist", yRobotBRDist);
+            telemetry.addData("xRobotBRPos", robotBRPos[0]);
+            telemetry.addData("yRobotBRPos", robotBRPos[1]);
 
-                    telemetry.addData("\nxRobotCenterPos", robotCenterPos[0]);
-                    telemetry.addData("yRobotCenterPos", robotCenterPos[1]);
+            telemetry.addData("\nxRobotCenterPos", robotCenterPos[0]);
+            telemetry.addData("yRobotCenterPos", robotCenterPos[1]);
 
-                    drive.setPoseEstimate(new Pose2d(robotCenterPos[0], robotCenterPos[1], yaw));
-                    drive.update();
-
-                }
-                telemetry.update();
-            }
+            drive.setPoseEstimate(new Pose2d(robotCenterPos[0], robotCenterPos[1], yaw));
+            drive.update();
         }
     }
 
