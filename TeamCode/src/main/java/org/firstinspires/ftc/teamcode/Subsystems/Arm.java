@@ -27,7 +27,7 @@ public class Arm {
     int armMax = 5;
     int armMin = 0;*/
 
-    int armSlidePos = 0;
+    int armSlidePos = -2;
 
     double armTargetPos = 0;
     double slideTargetPos = 0;
@@ -37,6 +37,8 @@ public class Arm {
     double slidePower = 1;
 
     final double slideCountsPerInch = 19970.0/5.0; //Counts Per Inch
+
+    final double slideConverter = 62.1/287.5;
 
 
     public Arm(HardwareMap hardwareMap){
@@ -103,57 +105,65 @@ public class Arm {
         armSlidePos = position; // to update in auto, redundant in teleop
 
         switch (armSlidePos){
+            case -4: //auto pixel stack intake
+                armTargetPos = 104.4;
+                slideTargetPos = 512;
+                break;
             case -3:
                 armTargetPos = 71; //auto place
-                slideTargetPos = 18843;
+                slideTargetPos = 5013;
                 break;
-            case -2:
+            case -2: //tele truss pass
                 armTargetPos = 93;
-                slideTargetPos = 7.5*slideCountsPerInch;
+                slideTargetPos = 4730;
                 break;
-            case -1:
-                armTargetPos = 93; //auto truss
+            case -1: //auto truss pass
+                armTargetPos = 93;
                 slideTargetPos = 0;
                 break;
-            case 0: // Intake 96
+            case 0: // Intake
                 armTargetPos = 102.35;
-                slideTargetPos = 7.5*slideCountsPerInch;
+                slideTargetPos = 4463;
                 break;
             case 1: // Low Place
                 armTargetPos = 68;
-                slideTargetPos = 8*slideCountsPerInch;
+                slideTargetPos = 4730;
                 break;
             case 2: // Medium Place
                 armTargetPos = 63;
-                slideTargetPos = 47994;
+                slideTargetPos = 7172;
                 break;
             case 3: // High Place
                 armTargetPos = 61;
-                slideTargetPos = 54114;
+                slideTargetPos = 9389;
                 break;
             case 4: // Climb High
                 armTargetPos = 37;
-                slideTargetPos = 53311;
+                slideTargetPos = 8656;
                 break;
             case 5: // Climb Low
                 armTargetPos = 37;
-                slideTargetPos = 26475;
+                slideTargetPos = 4707;
                 break;
             default:
                 throw new IllegalStateException("Unexpected position value: " + position); // todo: remove in comp
         }
+
+        //slideTargetPos *= slideConverter;
+        telemetry.addData("slidepos changed", slideTargetPos);
+        telemetry.addData("slide current pos", slideM.getCurrentPosition());
 
         if (armSlidePos != -1) {
 
             slidePower = 1;
             if (slideLimit.isPressed()) {
                 slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                slideM.setTargetPosition(1000);
+                slideM.setTargetPosition(355);
             } else {
                 slideM.setTargetPosition((int) slideTargetPos);
             }
 
-            if (slideM.getTargetPosition() >= 54306){
+            if (slideM.getCurrentPosition() >= 9500){
                 slidePower = 0;
             }
 
@@ -187,6 +197,17 @@ public class Arm {
 
     public boolean getSlideLimitState(){
         return slideLimit.isPressed();
+    }
+
+    public void runSlides(double slidePower){
+        slideM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slideM.setPower(slidePower);
+    }
+
+    public void stopSlides(){
+        slideM.setPower(0);
+        slideM.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void homeSlides(){

@@ -156,6 +156,8 @@ public class Intake {
                 GoToAngle(targetIntake, telemetry);
             }else if (arm.getArmSlidePos() == -1){
                 GoToAngle(83, telemetry);
+            }else if (arm.getArmSlidePos() == -4){
+                GoToAngle(132.736, telemetry);
             }
             else
             {

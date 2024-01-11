@@ -76,15 +76,15 @@ public class movemotor extends OpMode {
 
         if (gamepad2.x){
             intakeOuter.setPower(1);
+        }else{
+            intakeOuter.setPower(0);
         }
 
         if (gamepad2.y){
             intakeSucker.setPower(1);
+        }else{
+            intakeSucker.setPower(0);
         }
-
-        intakeSucker.setPower(0);
-        intakeOuter.setPower(0);
-
     }
 
     public void stop(){

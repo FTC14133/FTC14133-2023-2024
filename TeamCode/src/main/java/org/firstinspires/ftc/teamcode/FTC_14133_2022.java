@@ -57,15 +57,15 @@ public class  FTC_14133_2022 extends OpMode {
 
  public void teleopDrive(){
      Vector2d input = new Vector2d(
-             -gamepad1.left_stick_y*0.75,
-             -gamepad1.left_stick_x*0.75
+             -gamepad1.left_stick_y,
+             -gamepad1.left_stick_x
      );
 
      drive.setWeightedDrivePower(
              new Pose2d(
                      input.getX(),
                      input.getY(),
-                     -gamepad1.right_stick_x*0.5
+                     -gamepad1.right_stick_x*0.875
              )
      );
 

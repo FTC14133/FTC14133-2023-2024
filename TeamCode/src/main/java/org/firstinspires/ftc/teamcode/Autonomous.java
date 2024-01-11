@@ -108,8 +108,8 @@ public class Autonomous extends LinearOpMode {
 
 
         TrajectorySequence spikeL = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-46+sideOffset, -36.34*allianceFlip, Math.toRadians(startH)))
-                .lineToLinearHeading(new Pose2d(-46+sideOffset, -41.34*allianceFlip, Math.toRadians(startH)))
+                .lineToLinearHeading(new Pose2d(-47.54+sideOffset, -34.38*allianceFlip, Math.toRadians(startH)))
+                .lineToLinearHeading(new Pose2d(-47.54+sideOffset, -41.34*allianceFlip, Math.toRadians(startH)))
                 .build();
         TrajectorySequence spikeC = drive.trajectorySequenceBuilder(startPose)
                 .lineToLinearHeading(new Pose2d(-36.34+sideOffset, -34.29*allianceFlip, Math.toRadians(startH)))
@@ -243,10 +243,10 @@ public class Autonomous extends LinearOpMode {
                                         yBack = -42.5;
                                         break;
                                     case SPIKE_LEFT:
-                                        yBack = -33.5;
+                                        yBack = -30;
                                         break;
                                     case SPIKE_CENTER:
-                                        yBack = -36.5;
+                                        yBack = -35;
                                         break;
                                 }
                                 break;
@@ -359,8 +359,8 @@ public class Autonomous extends LinearOpMode {
                     armSlidePos = 1;
                 })
                 .addDisplacementMarker(() -> {
-                    armSlidePos = 0;
-                    intakeState = 1;
+                    armSlidePos = -4;
+                    intakeState = -4;
                 })
                 .lineToLinearHeading(new Pose2d(-57.5, -36.57, Math.toRadians(180)))
                 .lineToLinearHeading(new Pose2d(-56, -10.97, Math.toRadians(180)))
@@ -369,7 +369,8 @@ public class Autonomous extends LinearOpMode {
                     armSlidePos = -1;
                 })
                 .lineToLinearHeading(new Pose2d(38.86, -10.97, Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(42.74, -36.57, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(42.74, -42.57, Math.toRadians(0)))
+
                 .build();
     }
 

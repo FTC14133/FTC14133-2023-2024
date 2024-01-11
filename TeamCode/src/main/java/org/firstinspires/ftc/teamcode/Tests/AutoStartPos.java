@@ -13,13 +13,21 @@ public class AutoStartPos extends LinearOpMode {
     private Arm arm=null;
     private Intake intake=null;
 
+    boolean homing = true;
+
     @Override
     public void runOpMode() throws InterruptedException {
         arm = new Arm(hardwareMap);
         intake = new Intake(hardwareMap);
 
-        while (!arm.getSlideLimitState()){
-            arm.homeSlides();
+        waitForStart();
+
+        while (homing){
+            arm.runSlides(-1);
+            if (arm.getSlideLimitState()){
+                arm.stopSlides();
+                homing = false;
+            }
         }
     }
 

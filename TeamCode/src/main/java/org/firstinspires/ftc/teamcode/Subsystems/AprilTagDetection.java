@@ -128,7 +128,7 @@ public class AprilTagDetection {
             telemetry.addData("\nxRobotCenterPos", robotCenterPos[0]);
             telemetry.addData("yRobotCenterPos", robotCenterPos[1]);
 
-            drive.setPoseEstimate(new Pose2d(robotCenterPos[0], robotCenterPos[1], yaw));
+            drive.setPoseEstimate(new Pose2d(robotCenterPos[0], robotCenterPos[1], -yaw));
         }
     }
 
