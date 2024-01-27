@@ -102,7 +102,19 @@ public class Autonomous extends LinearOpMode {
             allianceFlip = -1;
         }
 
+        int redsidefar = 0;
+        if (alliance.equals(ALLIANCE_RED) && side.equals(SIDE_FAR)){
+            redsidefar = 6;
+        }
 
+        double bluespecialspikefaroffset = 0;
+        if (alliance.equals(ALLIANCE_BLUE) && side.equals(SIDE_FAR)){
+            bluespecialspikefaroffset = 4.5;
+        }
+        double bluespecialspikecloseoffset = 0;
+        if (alliance.equals(ALLIANCE_BLUE) && side.equals(SIDE_CLOSE)){
+            bluespecialspikecloseoffset = 4.5;
+        }
 
         TrajectorySequence spikeL = drive.trajectorySequenceBuilder(startPose)
                 .lineToConstantHeading(new Vector2d((-47+sideOffset), (-42*allianceFlip)))
@@ -114,7 +126,7 @@ public class Autonomous extends LinearOpMode {
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (-38*allianceFlip)))
                 .build();
         TrajectorySequence spikeR = drive.trajectorySequenceBuilder(startPose)
-                .lineToConstantHeading(new Vector2d((-24+sideOffset), (-42*allianceFlip)))
+                .lineToConstantHeading(new Vector2d((-24+sideOffset+redsidefar), (-42*allianceFlip)))
                 .lineToConstantHeading(new Vector2d((-24+sideOffset), (-45*allianceFlip)))
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (-45*allianceFlip)))
                 .build();
@@ -130,9 +142,9 @@ public class Autonomous extends LinearOpMode {
 //26.5
 
         TrajectorySequence spikeRBlueClose = drive.trajectorySequenceBuilder(startPose)
-                .lineToConstantHeading(new Vector2d((12-sideSpecialSpikeOffset), (40*(allianceFlip*-1))))
-                .lineToConstantHeading(new Vector2d((0-specialSpikeOffset), (37*(allianceFlip*-1))))
-                .lineToConstantHeading(new Vector2d((0-specialSpikeOffset), (40*(allianceFlip*-1))))
+                .lineToConstantHeading(new Vector2d((12-sideSpecialSpikeOffset), (39.5*(allianceFlip*-1))))
+                .lineToConstantHeading(new Vector2d((2-specialSpikeOffset-bluespecialspikefaroffset-bluespecialspikecloseoffset), (37*(allianceFlip*-1))))
+                .lineToConstantHeading(new Vector2d((1.5-specialSpikeOffset-bluespecialspikefaroffset-bluespecialspikecloseoffset), (40*(allianceFlip*-1))))
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (40*(allianceFlip*-1))))
                 .build();
 
@@ -201,30 +213,76 @@ public class Autonomous extends LinearOpMode {
                         double yBack = 0;
                         switch (alliance) {
                             case ALLIANCE_BLUE:
-                                switch (spike) {
-                                    case SPIKE_RIGHT:
-                                        yBack = 28.5;
+
+                                switch (side) {
+
+                                    case SIDE_CLOSE:
+                                        switch (spike) {
+                                            case SPIKE_RIGHT:
+                                                yBack = 28;
+                                                break;
+                                            case SPIKE_LEFT:
+                                                yBack = 35;
+                                                break;
+                                            case SPIKE_CENTER:
+                                                yBack = 41;
+                                                break;
+                                        }
                                         break;
-                                    case SPIKE_LEFT:
-                                        yBack = 39;
-                                        break;
-                                    case SPIKE_CENTER:
-                                        yBack = 38.5;
-                                        break;
+                                    case SIDE_FAR:
+                                        switch (spike) {
+                                            case SPIKE_RIGHT:
+                                                yBack = 48;
+                                                break;
+                                            case SPIKE_LEFT:
+                                                yBack = 27.5;
+                                                break;
+                                            case SPIKE_CENTER:
+                                                yBack = 37.5;
+                                                break;
+                                        }
                                 }
+//                                switch (spike) {
+//                                    case SPIKE_RIGHT:
+//                                        yBack = 28.25;
+//                                        break;
+//                                    case SPIKE_LEFT:
+//                                        yBack = 39;
+//                                        break;
+//                                    case SPIKE_CENTER:
+//                                        yBack = 38.5;
+//                                        break;
+//                                }
                                 break;
                             case ALLIANCE_RED:
-                                switch (spike) {
-                                    case SPIKE_RIGHT:
-                                        yBack = -48;
+                                switch (side){
+                                    case SIDE_CLOSE:
+                                        switch (spike) {
+                                            case SPIKE_RIGHT:
+                                                yBack = -48;
+                                                break;
+                                            case SPIKE_LEFT:
+                                                yBack = -35;
+                                                break;
+                                            case SPIKE_CENTER:
+                                                yBack = -41;
+                                                break;
+                                        }
                                         break;
-                                    case SPIKE_LEFT:
-                                        yBack = -31;
-                                        break;
-                                    case SPIKE_CENTER:
-                                        yBack = -39;
-                                        break;
+                                    case SIDE_FAR:
+                                        switch (spike) {
+                                            case SPIKE_RIGHT:
+                                                yBack = -48;
+                                                break;
+                                            case SPIKE_LEFT:
+                                                yBack = -31;
+                                                break;
+                                            case SPIKE_CENTER:
+                                                yBack = -40.5;
+                                                break;
+                                        }
                                 }
+
                                 break;
                         }
 

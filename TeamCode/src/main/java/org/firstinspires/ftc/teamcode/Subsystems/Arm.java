@@ -150,8 +150,8 @@ public class Arm {
         }
 
         //slideTargetPos *= slideConverter;
-        telemetry.addData("slidepos changed", slideTargetPos);
-        telemetry.addData("slide current pos", slideM.getCurrentPosition());
+        telemetry.addData("arm target angle", getArmAngle());
+        telemetry.addData("arm current angle", armTargetPos);
 
         if (armSlidePos != -1) {
 
@@ -180,6 +180,8 @@ public class Arm {
             armPower = 0;
             //telemetry.addData("inside", "arm stopper");
         }
+
+        armPower *= 0.5;
 
         //telemetry.addData("inside range", !((currentIntake > (targetIntake-5)) && (currentIntake < (targetIntake+5))));
         //telemetry.addData("on arm pos 0", armSlidePos != 0);
