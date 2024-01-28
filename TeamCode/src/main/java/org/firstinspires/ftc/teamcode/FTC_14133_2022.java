@@ -21,6 +21,8 @@ public class  FTC_14133_2022 extends OpMode {
 
     private SampleMecanumDrive drive=null;
 
+    double turnSpeed = 1;
+
 
  public void init() {
 
@@ -56,6 +58,13 @@ public class  FTC_14133_2022 extends OpMode {
  }
 
  public void teleopDrive(){
+
+     if (gamepad2.left_bumper){
+         turnSpeed = 0.65;
+     }else{
+         turnSpeed = 1;
+     }
+
      Vector2d input = new Vector2d(
              -gamepad1.left_stick_y,
              -gamepad1.left_stick_x
@@ -65,7 +74,7 @@ public class  FTC_14133_2022 extends OpMode {
              new Pose2d(
                      input.getX(),
                      input.getY(),
-                     -gamepad1.right_stick_x*0.875
+                     -gamepad1.right_stick_x*turnSpeed
              )
      );
 

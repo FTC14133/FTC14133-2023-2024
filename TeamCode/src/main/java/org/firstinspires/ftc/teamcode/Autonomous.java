@@ -219,13 +219,13 @@ public class Autonomous extends LinearOpMode {
                                     case SIDE_CLOSE:
                                         switch (spike) {
                                             case SPIKE_RIGHT:
-                                                yBack = 28;
+                                                yBack = 33;
                                                 break;
                                             case SPIKE_LEFT:
-                                                yBack = 35;
+                                                yBack = 46;
                                                 break;
                                             case SPIKE_CENTER:
-                                                yBack = 41;
+                                                yBack = 40;
                                                 break;
                                         }
                                         break;
@@ -259,13 +259,13 @@ public class Autonomous extends LinearOpMode {
                                     case SIDE_CLOSE:
                                         switch (spike) {
                                             case SPIKE_RIGHT:
-                                                yBack = -48;
+                                                yBack = -43;
                                                 break;
                                             case SPIKE_LEFT:
-                                                yBack = -35;
+                                                yBack = -29;
                                                 break;
                                             case SPIKE_CENTER:
-                                                yBack = -41;
+                                                yBack = -35;
                                                 break;
                                         }
                                         break;
@@ -310,7 +310,7 @@ public class Autonomous extends LinearOpMode {
                     break;
 
                 case PLACE:
-                    if (intakeTimer.seconds() >= 5.0){
+                    if (intakeTimer.seconds() >= 3.5){
                         outtakeState = 0;
 
                         currentState = State.PARK;
