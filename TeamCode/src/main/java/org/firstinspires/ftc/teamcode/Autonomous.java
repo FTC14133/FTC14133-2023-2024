@@ -103,8 +103,18 @@ public class Autonomous extends LinearOpMode {
         }
 
         int redsidefar = 0;
+        int redsidefarleft = 0;
+        int redsidefarleftfarlr = 0;
         if (alliance.equals(ALLIANCE_RED) && side.equals(SIDE_FAR)){
             redsidefar = 6;
+            redsidefarleft = 4;
+            redsidefarleftfarlr = 2;
+
+        }
+
+        double redsideclose = 0;
+        if (alliance.equals(ALLIANCE_RED) && side.equals(SIDE_CLOSE)){
+            redsideclose = 1.25;
         }
 
         double bluespecialspikefaroffset = 0;
@@ -112,13 +122,15 @@ public class Autonomous extends LinearOpMode {
             bluespecialspikefaroffset = 4.5;
         }
         double bluespecialspikecloseoffset = 0;
+        double bluespecialspikecloseoffsetclose = 0;
         if (alliance.equals(ALLIANCE_BLUE) && side.equals(SIDE_CLOSE)){
             bluespecialspikecloseoffset = 4.5;
+            bluespecialspikecloseoffsetclose = 0.75;
         }
 
         TrajectorySequence spikeL = drive.trajectorySequenceBuilder(startPose)
-                .lineToConstantHeading(new Vector2d((-47+sideOffset), (-42*allianceFlip)))
-                .lineToConstantHeading(new Vector2d((-47+sideOffset), (-45*allianceFlip)))
+                .lineToConstantHeading(new Vector2d((-47+sideOffset+redsidefarleft), (-42*allianceFlip)))
+                .lineToConstantHeading(new Vector2d((-47+sideOffset+redsidefarleft), (-45*allianceFlip)))
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (-45*allianceFlip)))
                 .build();
         TrajectorySequence spikeC = drive.trajectorySequenceBuilder(startPose)
@@ -126,7 +138,7 @@ public class Autonomous extends LinearOpMode {
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (-38*allianceFlip)))
                 .build();
         TrajectorySequence spikeR = drive.trajectorySequenceBuilder(startPose)
-                .lineToConstantHeading(new Vector2d((-24+sideOffset+redsidefar), (-42*allianceFlip)))
+                .lineToConstantHeading(new Vector2d((-24+sideOffset+redsidefar+redsideclose), (-42*allianceFlip)))
                 .lineToConstantHeading(new Vector2d((-24+sideOffset), (-45*allianceFlip)))
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (-45*allianceFlip)))
                 .build();
@@ -142,9 +154,9 @@ public class Autonomous extends LinearOpMode {
 //26.5
 
         TrajectorySequence spikeRBlueClose = drive.trajectorySequenceBuilder(startPose)
-                .lineToConstantHeading(new Vector2d((12-sideSpecialSpikeOffset), (39.5*(allianceFlip*-1))))
-                .lineToConstantHeading(new Vector2d((2-specialSpikeOffset-bluespecialspikefaroffset-bluespecialspikecloseoffset), (37*(allianceFlip*-1))))
-                .lineToConstantHeading(new Vector2d((1.5-specialSpikeOffset-bluespecialspikefaroffset-bluespecialspikecloseoffset), (40*(allianceFlip*-1))))
+                .lineToConstantHeading(new Vector2d((12-bluespecialspikecloseoffsetclose-sideSpecialSpikeOffset), (39.5*(allianceFlip*-1))))
+                .lineToConstantHeading(new Vector2d((2-specialSpikeOffset-bluespecialspikefaroffset-bluespecialspikecloseoffset+redsideclose), (37*(allianceFlip*-1))))
+                .lineToConstantHeading(new Vector2d((1.5-specialSpikeOffset-bluespecialspikefaroffset-bluespecialspikecloseoffset+redsideclose), (40*(allianceFlip*-1))))
                 .lineToConstantHeading(new Vector2d((-36+sideOffset), (40*(allianceFlip*-1))))
                 .build();
 
@@ -196,7 +208,7 @@ public class Autonomous extends LinearOpMode {
                             case SIDE_FAR:
                                 switch (spike){
                                     case SPIKE_LEFT: case SPIKE_RIGHT:
-                                        drive.followTrajectorySequenceAsync(updatefarLR(drive, allianceFlip));
+                                        drive.followTrajectorySequenceAsync(updatefarLR(drive, allianceFlip, redsidefarleftfarlr));
                                         break;
                                     case SPIKE_CENTER:
                                         drive.followTrajectorySequenceAsync(updateStraightTo(drive, allianceFlip, sideOffset, side, alliance));
@@ -231,10 +243,10 @@ public class Autonomous extends LinearOpMode {
                                         break;
                                     case SIDE_FAR:
                                         switch (spike) {
-                                            case SPIKE_RIGHT:
-                                                yBack = 48;
-                                                break;
                                             case SPIKE_LEFT:
+                                                yBack = 45;
+                                                break;
+                                            case SPIKE_RIGHT:
                                                 yBack = 27.5;
                                                 break;
                                             case SPIKE_CENTER:
@@ -259,26 +271,26 @@ public class Autonomous extends LinearOpMode {
                                     case SIDE_CLOSE:
                                         switch (spike) {
                                             case SPIKE_RIGHT:
-                                                yBack = -43;
+                                                yBack = -45;
                                                 break;
                                             case SPIKE_LEFT:
-                                                yBack = -29;
+                                                yBack = -33;
                                                 break;
                                             case SPIKE_CENTER:
-                                                yBack = -35;
+                                                yBack = -40;
                                                 break;
                                         }
                                         break;
                                     case SIDE_FAR:
                                         switch (spike) {
                                             case SPIKE_RIGHT:
-                                                yBack = -48;
+                                                yBack = -41;
                                                 break;
                                             case SPIKE_LEFT:
                                                 yBack = -31;
                                                 break;
                                             case SPIKE_CENTER:
-                                                yBack = -40.5;
+                                                yBack = -36;
                                                 break;
                                         }
                                 }
@@ -382,7 +394,7 @@ public class Autonomous extends LinearOpMode {
                 .build();
     }
 
-    public TrajectorySequence updatefarLR(SampleMecanumDrive drive, int allianceFlip){
+    public TrajectorySequence updatefarLR(SampleMecanumDrive drive, int allianceFlip, int redsidefarleftfarlr){
 
         //telemetry.addData("poseEstimate", drive.getPoseEstimate());
         //telemetry.update();
@@ -397,7 +409,7 @@ public class Autonomous extends LinearOpMode {
                 .addSpatialMarker(new Vector2d(9, -11*(allianceFlip)), () -> {
                     armSlidePos = -3;
                 })
-                .lineToConstantHeading(new Vector2d(-33, (-11*allianceFlip)))
+                .lineToConstantHeading(new Vector2d(-35+redsidefarleftfarlr, (-11*allianceFlip)))
                 .lineToConstantHeading(new Vector2d(35, (-11*allianceFlip)))
                 .turn(Math.toRadians(turnAngle))
                 .splineToConstantHeading(new Vector2d(42, (-36*allianceFlip)), Math.toRadians(180))
@@ -410,7 +422,7 @@ public class Autonomous extends LinearOpMode {
         //telemetry.update();
 
         return drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToConstantHeading(new Vector2d(53, yValue))
+                .lineToConstantHeading(new Vector2d(52.5, yValue))
                 .build();
     }
 
